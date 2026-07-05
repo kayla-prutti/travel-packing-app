@@ -13,15 +13,21 @@ export const styles = StyleSheet.create({
   },
   screen: {
     flexGrow: 1,
+    alignSelf: "center",
     backgroundColor: "#c9502e",
+    maxWidth: 480,
     paddingHorizontal: 32,
     paddingBottom: 26,
     paddingTop: 28,
+    width: "100%",
   },
   screenCompact: {
-    paddingBottom: 18,
+    paddingBottom: 14,
     paddingHorizontal: 26,
-    paddingTop: 18,
+    paddingTop: 14,
+  },
+  screenTiny: {
+    paddingHorizontal: 18,
   },
   brandRow: {
     alignItems: "center",
@@ -37,9 +43,9 @@ export const styles = StyleSheet.create({
     width: 56,
   },
   logoMarkCompact: {
-    borderRadius: 14,
-    height: 48,
-    width: 48,
+    borderRadius: 13,
+    height: 44,
+    width: 44,
   },
   brand: {
     color: "#fff8ea",
@@ -48,7 +54,7 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
   brandCompact: {
-    fontSize: 30,
+    fontSize: 28,
   },
   tripIcons: {
     flexDirection: "row",
@@ -56,8 +62,12 @@ export const styles = StyleSheet.create({
     marginTop: 54,
   },
   tripIconsCompact: {
-    gap: 38,
-    marginTop: 38,
+    gap: 30,
+    marginTop: 16,
+  },
+  tripIconsTiny: {
+    gap: 28,
+    marginTop: 30,
   },
   title: {
     color: "#fff8ea",
@@ -69,13 +79,17 @@ export const styles = StyleSheet.create({
     marginTop: 26,
   },
   titleCompact: {
-    fontSize: 44,
-    lineHeight: 45,
-    marginTop: 20,
-  },
-  titleNarrow: {
     fontSize: 40,
     lineHeight: 41,
+    marginTop: 12,
+  },
+  titleNarrow: {
+    fontSize: 34,
+    lineHeight: 35,
+  },
+  titleTiny: {
+    fontSize: 30,
+    lineHeight: 32,
   },
   subtitle: {
     color: "#ffd7c7",
@@ -84,17 +98,17 @@ export const styles = StyleSheet.create({
     marginTop: 22,
   },
   subtitleCompact: {
-    fontSize: 17,
-    lineHeight: 24,
-    marginTop: 16,
+    fontSize: 15,
+    lineHeight: 20,
+    marginTop: 10,
   },
   form: {
     gap: 13,
     marginTop: 34,
   },
   formCompact: {
-    gap: 10,
-    marginTop: 24,
+    gap: 8,
+    marginTop: 14,
   },
   field: {
     borderColor: "#ef977f",
@@ -104,9 +118,9 @@ export const styles = StyleSheet.create({
     paddingVertical: 13,
   },
   fieldCompact: {
-    borderRadius: 22,
-    paddingHorizontal: 20,
-    paddingVertical: 9,
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 7,
   },
   passwordField: {
     alignItems: "center",
@@ -131,8 +145,8 @@ export const styles = StyleSheet.create({
     padding: 0,
   },
   inputCompact: {
-    fontSize: 20,
-    lineHeight: 28,
+    fontSize: 18,
+    lineHeight: 24,
     marginTop: 1,
   },
   eyeButton: {
@@ -159,8 +173,8 @@ export const styles = StyleSheet.create({
     marginTop: 8,
   },
   primaryButtonCompact: {
-    height: 52,
-    marginTop: 5,
+    height: 46,
+    marginTop: 4,
   },
   primaryButtonText: {
     color: "#3a1a0e",
@@ -168,7 +182,7 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
   },
   primaryButtonTextCompact: {
-    fontSize: 23,
+    fontSize: 20,
   },
   buttonPressed: {
     backgroundColor: "#f1ad31",
@@ -183,7 +197,7 @@ export const styles = StyleSheet.create({
     marginTop: 22,
   },
   dividerRowCompact: {
-    marginTop: 16,
+    marginTop: 10,
   },
   divider: {
     backgroundColor: "#df8169",
@@ -200,8 +214,11 @@ export const styles = StyleSheet.create({
     marginTop: 18,
   },
   socialRowCompact: {
-    gap: 14,
-    marginTop: 13,
+    gap: 12,
+    marginTop: 8,
+  },
+  socialRowTiny: {
+    gap: 10,
   },
   socialButton: {
     alignItems: "center",
@@ -215,9 +232,9 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   socialButtonCompact: {
-    borderRadius: 18,
+    borderRadius: 16,
     gap: 8,
-    height: 52,
+    height: 44,
   },
   socialPressed: {
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -229,7 +246,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   appleWordmarkCompact: {
-    fontSize: 19,
+    fontSize: 16,
   },
   socialText: {
     color: "#fff8ea",
@@ -237,7 +254,7 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
   socialTextCompact: {
-    fontSize: 16,
+    fontSize: 14,
   },
   switchText: {
     color: "#efb29d",
@@ -246,8 +263,8 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   switchTextCompact: {
-    fontSize: 16,
-    marginTop: 12,
+    fontSize: 13,
+    marginTop: 8,
   },
   switchLink: {
     color: "#ffffff",

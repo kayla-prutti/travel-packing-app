@@ -5,13 +5,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { supabase } from "../../src/lib/supabase/native";
@@ -21,6 +21,7 @@ export function LoginPage() {
   const { height, width } = useWindowDimensions();
   const isCompact = height < 820;
   const isNarrow = width < 390;
+  const isTiny = width <= 340;
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -65,7 +66,13 @@ export function LoginPage() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.screen, isCompact && styles.screenCompact]}>
+          <View
+            style={[
+              styles.screen,
+              isCompact && styles.screenCompact,
+              isTiny && styles.screenTiny,
+            ]}
+          >
             <View style={styles.brandRow}>
               <View style={[styles.logoMark, isCompact && styles.logoMarkCompact]}>
                 <MaterialCommunityIcons
@@ -77,7 +84,13 @@ export function LoginPage() {
               <Text style={[styles.brand, isCompact && styles.brandCompact]}>Packwise</Text>
             </View>
 
-            <View style={[styles.tripIcons, isCompact && styles.tripIconsCompact]}>
+            <View
+              style={[
+                styles.tripIcons,
+                isCompact && styles.tripIconsCompact,
+                isTiny && styles.tripIconsTiny,
+              ]}
+            >
               <Ionicons name="sunny-outline" size={isCompact ? 21 : 24} color="#ffd98c" />
               <MaterialCommunityIcons
                 name="image-filter-hdr"
@@ -92,6 +105,7 @@ export function LoginPage() {
                 styles.title,
                 isCompact && styles.titleCompact,
                 isNarrow && styles.titleNarrow,
+                isTiny && styles.titleTiny,
               ]}
             >
               Pack smart for every kind of trip.
@@ -176,7 +190,13 @@ export function LoginPage() {
               <View style={styles.divider} />
             </View>
 
-            <View style={[styles.socialRow, isCompact && styles.socialRowCompact]}>
+            <View
+              style={[
+                styles.socialRow,
+                isCompact && styles.socialRowCompact,
+                isTiny && styles.socialRowTiny,
+              ]}
+            >
               <Pressable
                 onPress={() => handleSocialProvider("Apple")}
                 style={({ pressed }) => [
