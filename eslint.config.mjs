@@ -1,17 +1,15 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import expoConfig from "eslint-config-expo/flat.js";
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
+  ...expoConfig,
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
+    ".expo/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "src/next-app-legacy/**",
   ]),
 ]);
 
