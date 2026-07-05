@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Packwise",
+    "slug": "packwise",
+    "scheme": "packwise",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.packwise.app"
+    },
+    "android": {
+      "package": "com.packwise.app"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
