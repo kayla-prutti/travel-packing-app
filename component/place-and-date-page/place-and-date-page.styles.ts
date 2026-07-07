@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { appFontFamily } from "../../src/theme/typography";
+import { displayFontFamily } from "../../src/theme/typography";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -52,16 +52,16 @@ export const styles = StyleSheet.create({
   stepLabel: {
     color: "#d98a3d",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "600",
     letterSpacing: 1.2,
     marginTop: 22,
     textTransform: "uppercase",
   },
   title: {
     color: "#2d1b12",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 30,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 6,
   },
   newStopCard: {
@@ -75,7 +75,7 @@ export const styles = StyleSheet.create({
   newStopLabel: {
     color: "#c9502e",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "600",
     letterSpacing: 1.2,
     textTransform: "uppercase",
   },
@@ -146,7 +146,7 @@ export const styles = StyleSheet.create({
   addStopButtonText: {
     color: "#fff8ea",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   stopCard: {
     backgroundColor: "#fdf8ee",
@@ -170,12 +170,12 @@ export const styles = StyleSheet.create({
   stopBadgeText: {
     color: "#fff8ea",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   stopLabel: {
     color: "#a68a6c",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "600",
     letterSpacing: 1,
     textTransform: "uppercase",
   },
@@ -204,9 +204,9 @@ export const styles = StyleSheet.create({
   },
   stopCity: {
     color: "#2d1b12",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 21,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   stopCountry: {
     color: "#a68a6c",
@@ -261,7 +261,7 @@ export const styles = StyleSheet.create({
   continueButtonText: {
     color: "#fff8ea",
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   pickerBackdrop: {
     backgroundColor: "rgba(58,35,23,0.45)",
@@ -287,6 +287,6 @@ export const styles = StyleSheet.create({
   pickerDoneText: {
     color: "#fff8ea",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
   },
 });

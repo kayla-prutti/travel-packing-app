@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
+import { createAccountWithEmail, signInWithEmail } from "../../src/lib/auth/api";
 import { styles } from "./login-page.styles";
 
 type LoginPageProps = {
@@ -21,16 +22,41 @@ type LoginPageProps = {
 
 export function LoginPage({ onSignIn }: LoginPageProps) {
   const { height, width } = useWindowDimensions();
-  const isCompact = height < 820;
+  const isCompact = height < 900;
   const isNarrow = width < 390;
   const isTiny = width <= 340;
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit() {
-    onSignIn();
+  async function handleSubmit() {
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setIsSubmitting(true);
+
+    const result =
+      mode === "sign-in"
+        ? await signInWithEmail({ email, password })
+        : await createAccountWithEmail({ email, password });
+
+    setIsSubmitting(false);
+
+    if (result.error) {
+      setErrorMessage(result.error);
+      return;
+    }
+
+    if (result.signedIn) {
+      onSignIn();
+      return;
+    }
+
+    setSuccessMessage(result.message ?? "Account created. You can sign in now.");
+    setMode("sign-in");
   }
 
   function handleSocialProvider(provider: "Apple" | "Google") {
@@ -94,11 +120,14 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
               Pack smart for every kind of trip.
             </Text>
             <Text style={[styles.subtitle, isCompact && styles.subtitleCompact]}>
-              Tailored lists for hiking, city, beach and beyond - with a quick weather check so
+              Tailored lists for hiking, city, beach and beyond with a quick weather check so
               {" nothing's forgotten."}
             </Text>
 
             <View style={[styles.form, isCompact && styles.formCompact]}>
+              {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+              {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
+
               <View style={[styles.field, isCompact && styles.fieldCompact]}>
                 <Text style={styles.label}>Email</Text>
                 <TextInput
@@ -106,7 +135,7 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
                   autoComplete="email"
                   keyboardType="email-address"
                   onChangeText={setEmail}
-                  placeholder="alex@trailmail.co"
+                  placeholder="Email"
                   placeholderTextColor="rgba(255,255,255,0.45)"
                   style={[styles.input, isCompact && styles.inputCompact]}
                   value={email}
@@ -119,7 +148,7 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
                   <TextInput
                     autoCapitalize="none"
                     onChangeText={setPassword}
-                    placeholder="••••••••"
+                    placeholder="Password"
                     placeholderTextColor="rgba(255,255,255,0.45)"
                     secureTextEntry={!showPassword}
                     style={[styles.input, isCompact && styles.inputCompact]}
@@ -141,17 +170,25 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
               </View>
 
               <Pressable
+                disabled={isSubmitting}
                 onPress={handleSubmit}
                 style={({ pressed }) => [
                   styles.primaryButton,
                   isCompact && styles.primaryButtonCompact,
+                  isSubmitting && styles.disabledButton,
                   pressed && styles.buttonPressed,
                 ]}
               >
                 <Text
                   style={[styles.primaryButtonText, isCompact && styles.primaryButtonTextCompact]}
                 >
-                  {mode === "sign-in" ? "Sign in" : "Create account"}
+                  {isSubmitting
+                    ? mode === "sign-in"
+                      ? "Signing in..."
+                      : "Creating..."
+                    : mode === "sign-in"
+                      ? "Sign in"
+                      : "Create account"}
                 </Text>
               </Pressable>
             </View>
@@ -198,6 +235,10 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
               {mode === "sign-in" ? "New here?" : "Have an account?"}{" "}
               <Text
                 onPress={() => setMode(mode === "sign-in" ? "sign-up" : "sign-in")}
+                onPressIn={() => {
+                  setErrorMessage(null);
+                  setSuccessMessage(null);
+                }}
                 style={styles.switchLink}
               >
                 {mode === "sign-in" ? "Create account" : "Sign in"}

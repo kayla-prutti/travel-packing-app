@@ -12,6 +12,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@expo-google-fonts/instrument-sans": "^0.4.2",
+    "@expo-google-fonts/spectral": "^0.4.1",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "9.1.0",

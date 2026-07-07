@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { appFontFamily } from "../../src/theme/typography";
+import { displayFontFamily } from "../../src/theme/typography";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -20,19 +20,19 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
   },
   screen: {
-    flexGrow: 1,
     alignSelf: "center",
     backgroundColor: "#c9502e",
+    flexGrow: 1,
     maxWidth: 480,
-    paddingHorizontal: 32,
-    paddingBottom: 26,
-    paddingTop: 28,
+    paddingHorizontal: 34,
+    paddingBottom: 18,
+    paddingTop: 38,
     width: "100%",
   },
   screenCompact: {
-    paddingBottom: 14,
+    paddingBottom: 16,
     paddingHorizontal: 26,
-    paddingTop: 14,
+    paddingTop: 24,
   },
   screenTiny: {
     paddingHorizontal: 18,
@@ -40,15 +40,15 @@ export const styles = StyleSheet.create({
   brandRow: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 20,
+    gap: 18,
   },
   logoMark: {
     alignItems: "center",
     backgroundColor: "#eba325",
-    borderRadius: 16,
-    height: 56,
+    borderRadius: 13,
+    height: 50,
     justifyContent: "center",
-    width: 56,
+    width: 50,
   },
   logoMarkCompact: {
     borderRadius: 13,
@@ -57,21 +57,21 @@ export const styles = StyleSheet.create({
   },
   brand: {
     color: "#fff8ea",
-    fontFamily: appFontFamily,
-    fontSize: 34,
-    fontWeight: "700",
+    fontFamily: displayFontFamily,
+    fontSize: 30,
+    fontWeight: "600",
   },
   brandCompact: {
     fontSize: 28,
   },
   tripIcons: {
     flexDirection: "row",
-    gap: 44,
-    marginTop: 54,
+    gap: 38,
+    marginTop: 58,
   },
   tripIconsCompact: {
     gap: 30,
-    marginTop: 16,
+    marginTop: 22,
   },
   tripIconsTiny: {
     gap: 28,
@@ -79,17 +79,17 @@ export const styles = StyleSheet.create({
   },
   title: {
     color: "#fff8ea",
-    fontFamily: appFontFamily,
-    fontSize: 54,
-    fontWeight: "700",
+    fontFamily: displayFontFamily,
+    fontSize: 46,
+    fontWeight: "600",
     letterSpacing: 0,
-    lineHeight: 55,
-    marginTop: 26,
+    lineHeight: 50,
+    marginTop: 24,
   },
   titleCompact: {
-    fontSize: 40,
-    lineHeight: 41,
-    marginTop: 12,
+    fontSize: 34,
+    lineHeight: 37,
+    marginTop: 16,
   },
   titleNarrow: {
     fontSize: 34,
@@ -101,29 +101,29 @@ export const styles = StyleSheet.create({
   },
   subtitle: {
     color: "#ffd7c7",
-    fontSize: 20,
-    lineHeight: 29,
-    marginTop: 22,
+    fontSize: 18,
+    lineHeight: 26,
+    marginTop: 18,
   },
   subtitleCompact: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: 14,
+    lineHeight: 19,
     marginTop: 10,
   },
   form: {
-    gap: 13,
+    gap: 14,
     marginTop: 34,
   },
   formCompact: {
     gap: 8,
-    marginTop: 14,
+    marginTop: 16,
   },
   field: {
     borderColor: "#ef977f",
-    borderRadius: 24,
+    borderRadius: 22,
     borderWidth: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 13,
+    paddingHorizontal: 22,
+    paddingVertical: 12,
   },
   fieldCompact: {
     borderRadius: 20,
@@ -133,7 +133,7 @@ export const styles = StyleSheet.create({
   passwordField: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 16,
+    gap: 10,
   },
   passwordInputWrap: {
     flex: 1,
@@ -142,14 +142,14 @@ export const styles = StyleSheet.create({
     color: "#f3b69f",
     fontSize: 13,
     fontWeight: "600",
-    letterSpacing: 2.3,
+    letterSpacing: 2.4,
     textTransform: "uppercase",
   },
   input: {
     color: "#ffffff",
     fontSize: 22,
     lineHeight: 30,
-    marginTop: 3,
+    marginTop: 4,
     padding: 0,
   },
   inputCompact: {
@@ -172,22 +172,31 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
+  success: {
+    backgroundColor: "rgba(235,163,37,0.22)",
+    borderRadius: 16,
+    color: "#fff8ea",
+    fontSize: 14,
+    fontWeight: "600",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
   primaryButton: {
     alignItems: "center",
     backgroundColor: "#eba325",
-    borderRadius: 24,
+    borderRadius: 22,
     height: 58,
     justifyContent: "center",
-    marginTop: 8,
+    marginTop: 26,
   },
   primaryButtonCompact: {
     height: 46,
-    marginTop: 4,
+    marginTop: 14,
   },
   primaryButtonText: {
     color: "#3a1a0e",
     fontSize: 25,
-    fontWeight: "800",
+    fontWeight: "600",
   },
   primaryButtonTextCompact: {
     fontSize: 20,
@@ -202,7 +211,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 18,
-    marginTop: 22,
+    marginTop: 18,
   },
   dividerRowCompact: {
     marginTop: 10,
@@ -219,7 +228,7 @@ export const styles = StyleSheet.create({
   socialRow: {
     flexDirection: "row",
     gap: 20,
-    marginTop: 18,
+    marginTop: 14,
   },
   socialRowCompact: {
     gap: 12,
@@ -250,7 +259,7 @@ export const styles = StyleSheet.create({
   appleWordmark: {
     color: "#fff8ea",
     fontSize: 22,
-    fontWeight: "300",
+    fontWeight: "400",
     letterSpacing: 1,
   },
   appleWordmarkCompact: {
@@ -259,7 +268,7 @@ export const styles = StyleSheet.create({
   socialText: {
     color: "#fff8ea",
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   socialTextCompact: {
     fontSize: 14,
@@ -276,6 +285,6 @@ export const styles = StyleSheet.create({
   },
   switchLink: {
     color: "#ffffff",
-    fontWeight: "800",
+    fontWeight: "600",
   },
 });

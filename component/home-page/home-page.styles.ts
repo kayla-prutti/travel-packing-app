@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { appFontFamily } from "../../src/theme/typography";
+import { displayFontFamily } from "../../src/theme/typography";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -25,9 +25,9 @@ export const styles = StyleSheet.create({
   },
   name: {
     color: "#fff8ea",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 30,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 2,
   },
   avatar: {
@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
   accountName: {
     color: "#3a2317",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   accountEmail: {
     color: "#a68a6c",
@@ -77,12 +77,12 @@ export const styles = StyleSheet.create({
   logoutText: {
     color: "#c9502e",
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   avatarText: {
     color: "#3a1a0e",
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   list: {
     flex: 1,
@@ -103,9 +103,9 @@ export const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: "#3a2317",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 23,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   sectionCount: {
     color: "#a68a6c",
@@ -131,9 +131,9 @@ export const styles = StyleSheet.create({
   tripName: {
     color: "#3a2317",
     flexShrink: 1,
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   cardTopActions: {
     alignItems: "center",
@@ -152,7 +152,7 @@ export const styles = StyleSheet.create({
   weatherText: {
     color: "#c9502e",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   deleteButton: {
     alignItems: "center",
@@ -230,7 +230,7 @@ export const styles = StyleSheet.create({
   createButtonText: {
     color: "#fff8ea",
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   confirmBackdrop: {
     backgroundColor: "rgba(58,35,23,0.45)",
@@ -254,9 +254,9 @@ export const styles = StyleSheet.create({
   },
   confirmTitle: {
     color: "#3a2317",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 18,
   },
   confirmMessage: {
@@ -282,7 +282,7 @@ export const styles = StyleSheet.create({
   cancelButtonText: {
     color: "#3a2317",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   deleteConfirmButton: {
     alignItems: "center",
@@ -295,6 +295,6 @@ export const styles = StyleSheet.create({
   deleteConfirmButtonText: {
     color: "#fff8ea",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
   },
 });

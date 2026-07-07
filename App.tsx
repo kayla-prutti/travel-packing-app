@@ -1,4 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  InstrumentSans_400Regular,
+  InstrumentSans_500Medium,
+  InstrumentSans_600SemiBold,
+  useFonts as useInstrumentSansFonts,
+} from "@expo-google-fonts/instrument-sans";
+import {
+  Spectral_600SemiBold,
+  useFonts as useSpectralFonts,
+} from "@expo-google-fonts/spectral";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { HomePage, initialTrips } from "./component/home-page/home-page";
@@ -7,15 +17,45 @@ import { LoginPage } from "./component/login-page/login-page";
 import { BuildListPage } from "./component/build-list-page/build-list-page";
 import { PlaceAndDatePage } from "./component/place-and-date-page/place-and-date-page";
 import type { Stop } from "./component/place-and-date-page/place-and-date-page";
+import { signOut } from "./src/lib/auth/api";
+import { supabase } from "./src/lib/supabase/native";
+import { configureTypographyDefaults } from "./src/theme/typography";
 import { TripTypePage } from "./component/trip-type-page/trip-type-page";
 import { WeatherCheckPage } from "./component/weather-check-page/weather-check-page";
 
 type Screen = "login" | "home" | "trip-type" | "place-and-date" | "weather-check" | "build-list";
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>("trip-type");
+  const [instrumentSansLoaded] = useInstrumentSansFonts({
+    InstrumentSans_400Regular,
+    InstrumentSans_500Medium,
+    InstrumentSans_600SemiBold,
+  });
+  const [spectralLoaded] = useSpectralFonts({
+    Spectral_600SemiBold,
+  });
+  const [screen, setScreen] = useState<Screen>("login");
   const [stops, setStops] = useState<Stop[]>([]);
   const [trips, setTrips] = useState<Trip[]>(initialTrips);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (isMounted && data.session) {
+        setScreen("home");
+      }
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setScreen(session ? "home" : "login");
+    });
+
+    return () => {
+      isMounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   function formatTripName(selectedStops: Stop[]): string {
     const firstStop = selectedStops[0];
@@ -62,6 +102,17 @@ export default function App() {
     setScreen("home");
   }
 
+  async function handleLogout() {
+    await signOut();
+    setScreen("login");
+  }
+
+  if (!instrumentSansLoaded || !spectralLoaded) {
+    return null;
+  }
+
+  configureTypographyDefaults();
+
   return (
     <SafeAreaProvider>
       {screen === "login" && <LoginPage onSignIn={() => setScreen("home")} />}
@@ -69,7 +120,7 @@ export default function App() {
         <HomePage
           onCreateTrip={() => setScreen("trip-type")}
           onDeleteTrip={(id) => setTrips((current) => current.filter((trip) => trip.id !== id))}
-          onLogout={() => setScreen("login")}
+          onLogout={handleLogout}
           trips={trips}
         />
       )}

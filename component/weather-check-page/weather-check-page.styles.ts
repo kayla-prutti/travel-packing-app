@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { appFontFamily } from "../../src/theme/typography";
+import { displayFontFamily } from "../../src/theme/typography";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -48,16 +48,16 @@ export const styles = StyleSheet.create({
   stepLabel: {
     color: "#d98a3d",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "600",
     letterSpacing: 1.2,
     marginTop: 22,
     textTransform: "uppercase",
   },
   title: {
     color: "#2d1b12",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 40,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 6,
   },
   noticeCard: {
@@ -94,9 +94,9 @@ export const styles = StyleSheet.create({
   },
   currentTemp: {
     color: "#fff8ea",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 72,
-    fontWeight: "700",
+    fontWeight: "600",
     lineHeight: 86,
     marginTop: 10,
   },
@@ -124,13 +124,13 @@ export const styles = StyleSheet.create({
   weatherStatValue: {
     color: "#fff8ea",
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 6,
   },
   sectionLabel: {
     color: "#8b7a65",
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: "600",
     letterSpacing: 1,
     marginTop: 28,
     textTransform: "uppercase",
@@ -166,7 +166,7 @@ export const styles = StyleSheet.create({
   dayName: {
     color: "#2d1b12",
     fontSize: 16,
-    fontWeight: "800",
+    fontWeight: "600",
   },
   dayDate: {
     color: "#a68a6c",
@@ -179,7 +179,7 @@ export const styles = StyleSheet.create({
   dayHigh: {
     color: "#2d1b12",
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: "600",
     marginTop: 12,
   },
   dayLow: {
@@ -204,7 +204,7 @@ export const styles = StyleSheet.create({
   extrasTitle: {
     color: "#5b421b",
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "600",
   },
   extrasText: {
     color: "#916520",
@@ -233,6 +233,6 @@ export const styles = StyleSheet.create({
   buildButtonText: {
     color: "#fff8ea",
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "600",
   },
 });

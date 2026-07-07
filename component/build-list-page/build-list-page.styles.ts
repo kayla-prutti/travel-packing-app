@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { appFontFamily } from "../../src/theme/typography";
+import { displayFontFamily } from "../../src/theme/typography";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
   stepLabel: {
     color: "#c9502e",
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "600",
     letterSpacing: 1.2,
     marginBottom: 4,
     textTransform: "uppercase",
@@ -39,15 +39,15 @@ export const styles = StyleSheet.create({
   tripLabel: {
     color: "#e08b20",
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: "600",
     letterSpacing: 1.8,
     textTransform: "uppercase",
   },
   title: {
     color: "#2d1b12",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 34,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 4,
   },
   progressRow: {
@@ -72,7 +72,7 @@ export const styles = StyleSheet.create({
   progressText: {
     color: "#8b7a65",
     fontSize: 17,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   scrollView: {
     flex: 1,
@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
   weatherBang: {
     color: "#c27a18",
     fontSize: 28,
-    fontWeight: "900",
+    fontWeight: "600",
     width: 28,
     textAlign: "center",
   },
@@ -106,7 +106,7 @@ export const styles = StyleSheet.create({
     color: "#5b421b",
     flex: 1,
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "600",
   },
   weatherIntro: {
     color: "#8b5f1f",
@@ -142,7 +142,7 @@ export const styles = StyleSheet.create({
   itemLabel: {
     color: "#2d1b12",
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "600",
   },
   itemDetailRow: {
     alignItems: "center",
@@ -174,7 +174,7 @@ export const styles = StyleSheet.create({
   sectionLabel: {
     color: "#8b7a65",
     fontSize: 18,
-    fontWeight: "800",
+    fontWeight: "600",
     letterSpacing: 1.5,
     marginBottom: 14,
     marginLeft: 6,
@@ -255,6 +255,6 @@ export const styles = StyleSheet.create({
   saveButtonText: {
     color: "#fff8ea",
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "600",
   },
 });

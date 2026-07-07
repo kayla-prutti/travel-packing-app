@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { appFontFamily } from "../../src/theme/typography";
+import { displayFontFamily } from "../../src/theme/typography";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
   stepLabel: {
     color: "#d98a3d",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "600",
     letterSpacing: 1.2,
     marginTop: 22,
     paddingHorizontal: 20,
@@ -55,9 +55,9 @@ export const styles = StyleSheet.create({
   },
   title: {
     color: "#2d1b12",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 30,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 6,
     paddingHorizontal: 20,
   },
@@ -101,9 +101,9 @@ export const styles = StyleSheet.create({
   },
   cardLabel: {
     color: "#2d1b12",
-    fontFamily: appFontFamily,
+    fontFamily: displayFontFamily,
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
     marginTop: 14,
   },
   cardDescription: {
@@ -135,6 +135,6 @@ export const styles = StyleSheet.create({
   continueButtonText: {
     color: "#fff8ea",
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
   },
 });
