@@ -6,18 +6,19 @@ export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     minHeight: 0,
-    backgroundColor: "#c9502e",
+    backgroundColor: "#f7ecd9",
   },
   header: {
     alignItems: "center",
     backgroundColor: "#c9502e",
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingBottom: 28,
     paddingHorizontal: 24,
-    paddingTop: 8,
+    paddingTop: 22,
+  },
+  headerCopy: {
+    justifyContent: "center",
   },
   greeting: {
     color: "#ffd7c7",

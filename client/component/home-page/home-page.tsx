@@ -17,41 +17,43 @@ export type Trip = {
   packedStatus: PackedStatus;
 };
 
-export const initialTrips: Trip[] = [
-  {
-    id: "1",
-    name: "Reykjavík City Break",
-    location: "Iceland · 2 stops",
-    dateRange: "Nov 8 – 15",
-    weatherIcon: "rainy",
-    weatherRange: "2–8°",
-    packedStatus: { packed: 0, total: 18 },
-  },
-  {
-    id: "2",
-    name: "Chamonix Ski Week",
-    location: "France",
-    dateRange: "Jan 12 – 19",
-    weatherIcon: "snow",
-    weatherRange: "-6–1°",
-    packedStatus: "not-started",
-  },
-];
-
 type HomePageProps = {
+  accountEmail: string;
+  displayName: string;
   onLogout: () => void;
   onCreateTrip: () => void;
   onDeleteTrip: (id: string) => void;
   trips: Trip[];
 };
 
-export function HomePage({ onLogout, onCreateTrip, onDeleteTrip, trips }: HomePageProps) {
+function getLocalGreeting() {
+  const hour = new Date().getHours();
+  if (!Number.isFinite(hour)) {
+    return "Hello";
+  }
+  if (hour < 12) {
+    return "Good morning";
+  }
+  if (hour < 18) {
+    return "Good afternoon";
+  }
+  return "Good evening";
+}
+
+export function HomePage({
+  accountEmail,
+  displayName,
+  onLogout,
+  onCreateTrip,
+  onDeleteTrip,
+  trips,
+}: HomePageProps) {
   const insets = useSafeAreaInsets();
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Trip | null>(null);
 
-  const displayName = "Alex";
   const avatarInitial = displayName.charAt(0).toUpperCase();
+  const greeting = getLocalGreeting();
 
   function requestDeleteTrip(trip: Trip) {
     setDeleteTarget(trip);
@@ -77,8 +79,8 @@ export function HomePage({ onLogout, onCreateTrip, onDeleteTrip, trips }: HomePa
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Good morning</Text>
+        <View style={styles.headerCopy}>
+          <Text style={styles.greeting}>{greeting}</Text>
           <Text style={styles.name}>{displayName}</Text>
         </View>
         <Pressable onPress={() => setMenuOpen(true)} style={styles.avatar}>
@@ -95,7 +97,7 @@ export function HomePage({ onLogout, onCreateTrip, onDeleteTrip, trips }: HomePa
         <Pressable onPress={() => setMenuOpen(false)} style={styles.menuBackdrop}>
           <View style={[styles.accountMenu, { top: insets.top + 68, right: 20 }]}>
             <Text style={styles.accountName}>{displayName}</Text>
-            <Text style={styles.accountEmail}>alex@trailmail.co</Text>
+            <Text style={styles.accountEmail}>{accountEmail}</Text>
             <View style={styles.accountDivider} />
             <Pressable onPress={handleLogout} style={styles.logoutRow}>
               <Ionicons name="log-out-outline" size={18} color="#c9502e" />

@@ -5,13 +5,14 @@ import {
   InstrumentSans_600SemiBold,
   useFonts as useInstrumentSansFonts,
 } from "@expo-google-fonts/instrument-sans";
+import type { Session } from "@supabase/supabase-js";
 import {
   Spectral_600SemiBold,
   useFonts as useSpectralFonts,
 } from "@expo-google-fonts/spectral";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { HomePage, initialTrips } from "./component/home-page/home-page";
+import { HomePage } from "./component/home-page/home-page";
 import type { Trip } from "./component/home-page/home-page";
 import { LoginPage } from "./component/login-page/login-page";
 import { BuildListPage } from "./component/build-list-page/build-list-page";
@@ -36,18 +37,26 @@ export default function App() {
   });
   const [screen, setScreen] = useState<Screen>("login");
   const [stops, setStops] = useState<Stop[]>([]);
-  const [trips, setTrips] = useState<Trip[]>(initialTrips);
+  const [session, setSession] = useState<Session | null>(null);
+  const [tripsByUser, setTripsByUser] = useState<Record<string, Trip[]>>({});
+
+  const currentUserId = session?.user.id ?? null;
+  const currentTrips = currentUserId ? tripsByUser[currentUserId] ?? [] : [];
+  const accountEmail = session?.user.email ?? "";
+  const displayName = accountEmail ? accountEmail.split("@")[0] : "Traveler";
 
   useEffect(() => {
     let isMounted = true;
 
     supabase.auth.getSession().then(({ data }) => {
       if (isMounted && data.session) {
+        setSession(data.session);
         setScreen("home");
       }
     });
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
       setScreen(session ? "home" : "login");
     });
 
@@ -97,7 +106,12 @@ export default function App() {
       weatherRange: "1–8°",
       packedStatus,
     };
-    setTrips((current) => [trip, ...current]);
+    if (currentUserId) {
+      setTripsByUser((current) => ({
+        ...current,
+        [currentUserId]: [trip, ...(current[currentUserId] ?? [])],
+      }));
+    }
     setStops([]);
     setScreen("home");
   }
@@ -118,10 +132,20 @@ export default function App() {
       {screen === "login" && <LoginPage onSignIn={() => setScreen("home")} />}
       {screen === "home" && (
         <HomePage
+          accountEmail={accountEmail}
+          displayName={displayName}
           onCreateTrip={() => setScreen("trip-type")}
-          onDeleteTrip={(id) => setTrips((current) => current.filter((trip) => trip.id !== id))}
+          onDeleteTrip={(id) => {
+            if (!currentUserId) {
+              return;
+            }
+            setTripsByUser((current) => ({
+              ...current,
+              [currentUserId]: (current[currentUserId] ?? []).filter((trip) => trip.id !== id),
+            }));
+          }}
           onLogout={handleLogout}
-          trips={trips}
+          trips={currentTrips}
         />
       )}
       {screen === "trip-type" && (
