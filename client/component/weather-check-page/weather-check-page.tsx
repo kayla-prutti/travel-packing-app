@@ -34,6 +34,9 @@ function formatLocation(stops: Stop[]): string {
   if (!firstStop) {
     return "Your destination";
   }
+  if (firstStop.weatherLocationQuery) {
+    return firstStop.weatherLocationQuery;
+  }
   return firstStop.country ? `${firstStop.city}, ${firstStop.country}` : firstStop.city;
 }
 

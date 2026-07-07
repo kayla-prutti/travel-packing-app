@@ -80,7 +80,9 @@ export default function App() {
       return "Destination pending";
     }
     const stopCount = selectedStops.length === 1 ? "1 stop" : `${selectedStops.length} stops`;
-    return firstStop.country ? `${firstStop.country} · ${stopCount}` : stopCount;
+    return firstStop.weatherLocationQuery
+      ? `${firstStop.weatherLocationQuery} · ${stopCount}`
+      : stopCount;
   }
 
   function formatDateRange(selectedStops: Stop[]): string {

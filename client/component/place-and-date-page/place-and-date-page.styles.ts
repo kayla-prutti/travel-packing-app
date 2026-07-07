@@ -97,6 +97,17 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
+  locationMessageSlot: {
+    justifyContent: "center",
+    minHeight: 28,
+  },
+  locationError: {
+    color: "#c9502e",
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 18,
+    marginTop: 8,
+  },
   dateRow: {
     flexDirection: "row",
     gap: 12,

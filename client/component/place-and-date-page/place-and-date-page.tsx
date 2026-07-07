@@ -14,12 +14,16 @@ import DateTimePicker, { type DateTimePickerEvent } from "@react-native-communit
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
+import { geocodeLocation } from "../../src/weather/geocoding";
 import { styles } from "./place-and-date-page.styles";
 
 export type Stop = {
   id: string;
   city: string;
   country: string;
+  latitude: number;
+  longitude: number;
+  weatherLocationQuery: string;
   arrive: Date;
   leave: Date;
 };
@@ -49,6 +53,8 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
   const [arriveDate, setArriveDate] = useState<Date | null>(null);
   const [leaveDate, setLeaveDate] = useState<Date | null>(null);
   const [activeField, setActiveField] = useState<ActiveField>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [isCheckingLocation, setIsCheckingLocation] = useState(false);
 
   const canAddStop =
     cityInput.trim() !== "" && arriveDate !== null && leaveDate !== null && leaveDate > arriveDate;
@@ -68,18 +74,42 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
     }
   }
 
-  function handleAddStop() {
+  async function handleAddStop() {
     if (!canAddStop || !arriveDate || !leaveDate) {
       return;
     }
-    const [city, ...rest] = cityInput.split(",").map((part) => part.trim());
-    setStops((current) => [
-      ...current,
-      { id: `${Date.now()}`, city, country: rest.join(", "), arrive: arriveDate, leave: leaveDate },
-    ]);
-    setCityInput("");
-    setArriveDate(null);
-    setLeaveDate(null);
+    setLocationError(null);
+    setIsCheckingLocation(true);
+    const weatherLocationQuery = cityInput.trim().replace(/\s+/g, " ");
+    try {
+      const location = await geocodeLocation(weatherLocationQuery);
+      if (!location) {
+        setLocationError("Choose a real city or place so we can get the forecast.");
+        return;
+      }
+      setStops((current) => [
+        ...current,
+        {
+          id: `${Date.now()}`,
+          city: location.name,
+          country: location.admin1
+            ? `${location.admin1}, ${location.country}`
+            : location.country,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          weatherLocationQuery,
+          arrive: arriveDate,
+          leave: leaveDate,
+        },
+      ]);
+      setCityInput("");
+      setArriveDate(null);
+      setLeaveDate(null);
+    } catch (error) {
+      setLocationError(error instanceof Error ? error.message : "Unable to check that location right now.");
+    } finally {
+      setIsCheckingLocation(false);
+    }
   }
 
   function handleDeleteStop(id: string) {
@@ -128,14 +158,20 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
           <View style={styles.newStopCard}>
             <Text style={styles.newStopLabel}>New stop</Text>
 
-            <Text style={styles.fieldLabel}>City</Text>
+            <Text style={styles.fieldLabel}>City or place</Text>
             <TextInput
-              onChangeText={setCityInput}
-              placeholder="e.g. Oslo, Norway"
+              onChangeText={(value) => {
+                setCityInput(value);
+                setLocationError(null);
+              }}
+              placeholder="e.g. Reykjavík, Iceland"
               placeholderTextColor="rgba(58,35,23,0.35)"
               style={styles.cityInput}
               value={cityInput}
             />
+            <View style={styles.locationMessageSlot}>
+              {locationError ? <Text style={styles.locationError}>{locationError}</Text> : null}
+            </View>
 
             <View style={styles.dateRow}>
               <View style={styles.dateField}>
@@ -163,12 +199,14 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
               onPress={handleAddStop}
               style={({ pressed }) => [
                 styles.addStopButton,
-                !canAddStop && styles.addStopButtonDisabled,
-                pressed && canAddStop && styles.addStopButtonPressed,
+                (!canAddStop || isCheckingLocation) && styles.addStopButtonDisabled,
+                pressed && canAddStop && !isCheckingLocation && styles.addStopButtonPressed,
               ]}
             >
               <Ionicons name="add-circle-outline" size={18} color="#fff8ea" />
-              <Text style={styles.addStopButtonText}>Add this stop</Text>
+              <Text style={styles.addStopButtonText}>
+                {isCheckingLocation ? "Checking place..." : "Add this stop"}
+              </Text>
             </Pressable>
           </View>
 
