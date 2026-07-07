@@ -1,6 +1,4 @@
-import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,8 +11,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { createAccountWithEmail, signInWithEmail } from "../../src/lib/auth/api";
 import { styles } from "./login-page.styles";
+import { useLoginPage } from "./use-login-page";
 
 type LoginPageProps = {
   onSignIn: () => void;
@@ -25,43 +23,21 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
   const isCompact = height < 900;
   const isNarrow = width < 390;
   const isTiny = width <= 340;
-  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  async function handleSubmit() {
-    setErrorMessage(null);
-    setSuccessMessage(null);
-    setIsSubmitting(true);
-
-    const result =
-      mode === "sign-in"
-        ? await signInWithEmail({ email, password })
-        : await createAccountWithEmail({ email, password });
-
-    setIsSubmitting(false);
-
-    if (result.error) {
-      setErrorMessage(result.error);
-      return;
-    }
-
-    if (result.signedIn) {
-      onSignIn();
-      return;
-    }
-
-    setSuccessMessage(result.message ?? "Account created. You can sign in now.");
-    setMode("sign-in");
-  }
-
-  function handleSocialProvider(provider: "Apple" | "Google") {
-    Alert.alert(`${provider} sign in`, "Provider setup can be added after the login screen.");
-  }
+  const {
+    email,
+    errorMessage,
+    isSubmitting,
+    mode,
+    password,
+    setEmail,
+    setPassword,
+    setShowPassword,
+    showPassword,
+    submitEmailAuth,
+    submitSocialAuth,
+    successMessage,
+    toggleMode,
+  } = useLoginPage({ onSignIn });
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -171,7 +147,7 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
 
               <Pressable
                 disabled={isSubmitting}
-                onPress={handleSubmit}
+                onPress={submitEmailAuth}
                 style={({ pressed }) => [
                   styles.primaryButton,
                   isCompact && styles.primaryButtonCompact,
@@ -207,10 +183,12 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
               ]}
             >
               <Pressable
-                onPress={() => handleSocialProvider("Apple")}
+                disabled={isSubmitting}
+                onPress={() => submitSocialAuth("apple")}
                 style={({ pressed }) => [
                   styles.socialButton,
                   isCompact && styles.socialButtonCompact,
+                  isSubmitting && styles.disabledButton,
                   pressed && styles.socialPressed,
                 ]}
               >
@@ -219,10 +197,12 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
               </Pressable>
 
               <Pressable
-                onPress={() => handleSocialProvider("Google")}
+                disabled={isSubmitting}
+                onPress={() => submitSocialAuth("google")}
                 style={({ pressed }) => [
                   styles.socialButton,
                   isCompact && styles.socialButtonCompact,
+                  isSubmitting && styles.disabledButton,
                   pressed && styles.socialPressed,
                 ]}
               >
@@ -234,11 +214,7 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
             <Text style={[styles.switchText, isCompact && styles.switchTextCompact]}>
               {mode === "sign-in" ? "New here?" : "Have an account?"}{" "}
               <Text
-                onPress={() => setMode(mode === "sign-in" ? "sign-up" : "sign-in")}
-                onPressIn={() => {
-                  setErrorMessage(null);
-                  setSuccessMessage(null);
-                }}
+                onPress={toggleMode}
                 style={styles.switchLink}
               >
                 {mode === "sign-in" ? "Create account" : "Sign in"}
