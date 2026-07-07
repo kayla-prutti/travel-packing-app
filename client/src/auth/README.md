@@ -9,4 +9,4 @@ Responsibilities:
 - Store and refresh Supabase client sessions on device.
 - Keep React Native components away from server-only code.
 
-Do not import from `src/server/auth` in client components.
+Do not import backend/server-only modules in client components.

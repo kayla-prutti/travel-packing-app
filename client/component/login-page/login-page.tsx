@@ -66,7 +66,7 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
                   color="#2d170d"
                 />
               </View>
-              <Text style={[styles.brand, isCompact && styles.brandCompact]}>Packwise</Text>
+              <Text style={[styles.brand, isCompact && styles.brandCompact]}>PackSmart</Text>
             </View>
 
             <View
@@ -101,9 +101,6 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
             </Text>
 
             <View style={[styles.form, isCompact && styles.formCompact]}>
-              {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-              {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
-
               <View style={[styles.field, isCompact && styles.fieldCompact]}>
                 <Text style={styles.label}>Email</Text>
                 <TextInput
@@ -143,6 +140,19 @@ export function LoginPage({ onSignIn }: LoginPageProps) {
                     color="#f4b49d"
                   />
                 </Pressable>
+              </View>
+
+              <View style={[styles.messageSlot, isCompact && styles.messageSlotCompact]}>
+                {errorMessage ? (
+                  <Text numberOfLines={2} style={styles.error}>
+                    {errorMessage}
+                  </Text>
+                ) : null}
+                {!errorMessage && successMessage ? (
+                  <Text numberOfLines={2} style={styles.success}>
+                    {successMessage}
+                  </Text>
+                ) : null}
               </View>
 
               <Pressable

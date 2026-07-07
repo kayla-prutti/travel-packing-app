@@ -141,7 +141,7 @@ export function HomePage({ onLogout, onCreateTrip, onDeleteTrip, trips }: HomePa
           <View style={styles.addTripPrompt}>
             <MaterialCommunityIcons name="bag-suitcase-outline" size={22} color="#c9502e" />
             <Text style={styles.addTripPromptText}>
-              Add a trip and Packwise builds your list in seconds — tick things off whenever
+              Add a trip and PackSmart builds your list in seconds — tick things off whenever
               you pack.
             </Text>
           </View>

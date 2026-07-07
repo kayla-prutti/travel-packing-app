@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Packwise",
-    "slug": "packwise",
-    "scheme": "packwise",
+    "name": "PackSmart",
+    "slug": "packsmart",
+    "scheme": "packsmart",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.packwise.app"
+      "bundleIdentifier": "com.packsmart.app"
     },
     "android": {
-      "package": "com.packwise.app"
+      "package": "com.packsmart.app"
     },
     "web": {
       "bundler": "metro"
