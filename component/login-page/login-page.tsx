@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -14,10 +13,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { supabase } from "../../src/lib/supabase/native";
 import { styles } from "./login-page.styles";
 
-export function LoginPage() {
+type LoginPageProps = {
+  onSignIn: () => void;
+};
+
+export function LoginPage({ onSignIn }: LoginPageProps) {
   const { height, width } = useWindowDimensions();
   const isCompact = height < 820;
   const isNarrow = width < 390;
@@ -26,29 +28,9 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit() {
-    setError(null);
-    setLoading(true);
-
-    const { error } =
-      mode === "sign-in"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
-
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
-      return;
-    }
-
-    Alert.alert(
-      mode === "sign-in" ? "Signed in" : "Account created",
-      "The next app screen can be added after login."
-    );
+  function handleSubmit() {
+    onSignIn();
   }
 
   function handleSocialProvider(provider: "Apple" | "Google") {
@@ -65,6 +47,7 @@ export function LoginPage() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          style={styles.scrollView}
         >
           <View
             style={[
@@ -157,30 +140,19 @@ export function LoginPage() {
                 </Pressable>
               </View>
 
-              {error ? <Text style={styles.error}>{error}</Text> : null}
-
               <Pressable
-                disabled={loading}
                 onPress={handleSubmit}
                 style={({ pressed }) => [
                   styles.primaryButton,
                   isCompact && styles.primaryButtonCompact,
                   pressed && styles.buttonPressed,
-                  loading && styles.disabledButton,
                 ]}
               >
-                {loading ? (
-                  <ActivityIndicator color="#3a1a0e" />
-                ) : (
-                  <Text
-                    style={[
-                      styles.primaryButtonText,
-                      isCompact && styles.primaryButtonTextCompact,
-                    ]}
-                  >
-                    {mode === "sign-in" ? "Sign in" : "Create account"}
-                  </Text>
-                )}
+                <Text
+                  style={[styles.primaryButtonText, isCompact && styles.primaryButtonTextCompact]}
+                >
+                  {mode === "sign-in" ? "Sign in" : "Create account"}
+                </Text>
               </Pressable>
             </View>
 
@@ -205,9 +177,7 @@ export function LoginPage() {
                   pressed && styles.socialPressed,
                 ]}
               >
-                <Text style={[styles.appleWordmark, isCompact && styles.appleWordmarkCompact]}>
-                  APPLE
-                </Text>
+                <MaterialCommunityIcons name="apple" size={24} color="#fff8ea" />
                 <Text style={[styles.socialText, isCompact && styles.socialTextCompact]}>Apple</Text>
               </Pressable>
 
@@ -219,7 +189,7 @@ export function LoginPage() {
                   pressed && styles.socialPressed,
                 ]}
               >
-                <MaterialCommunityIcons name="google-translate" size={24} color="#fff8ea" />
+                <MaterialCommunityIcons name="google" size={24} color="#fff8ea" />
                 <Text style={[styles.socialText, isCompact && styles.socialTextCompact]}>Google</Text>
               </Pressable>
             </View>
@@ -227,10 +197,7 @@ export function LoginPage() {
             <Text style={[styles.switchText, isCompact && styles.switchTextCompact]}>
               {mode === "sign-in" ? "New here?" : "Have an account?"}{" "}
               <Text
-                onPress={() => {
-                  setError(null);
-                  setMode(mode === "sign-in" ? "sign-up" : "sign-in");
-                }}
+                onPress={() => setMode(mode === "sign-in" ? "sign-up" : "sign-in")}
                 style={styles.switchLink}
               >
                 {mode === "sign-in" ? "Create account" : "Sign in"}

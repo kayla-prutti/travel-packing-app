@@ -1,12 +1,20 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+
+import { appFontFamily } from "../../src/theme/typography";
 
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    minHeight: 0,
     backgroundColor: "#c9502e",
   },
   keyboard: {
     flex: 1,
+    minHeight: 0,
+  },
+  scrollView: {
+    flex: 1,
+    minHeight: 0,
   },
   scrollContent: {
     flexGrow: 1,
@@ -49,7 +57,7 @@ export const styles = StyleSheet.create({
   },
   brand: {
     color: "#fff8ea",
-    fontFamily: Platform.select({ ios: "Georgia", default: "serif" }),
+    fontFamily: appFontFamily,
     fontSize: 34,
     fontWeight: "700",
   },
@@ -71,7 +79,7 @@ export const styles = StyleSheet.create({
   },
   title: {
     color: "#fff8ea",
-    fontFamily: Platform.select({ ios: "Georgia", default: "serif" }),
+    fontFamily: appFontFamily,
     fontSize: 54,
     fontWeight: "700",
     letterSpacing: 0,
