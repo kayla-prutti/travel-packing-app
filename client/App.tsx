@@ -22,6 +22,7 @@ import { signOut } from "./src/auth/auth-client";
 import { supabase } from "./src/lib/supabase/native";
 import { configureTypographyDefaults } from "./src/theme/typography";
 import { TripTypePage } from "./component/trip-type-page/trip-type-page";
+import type { TripType } from "./component/trip-type-page/trip-type-page";
 import { WeatherCheckPage } from "./component/weather-check-page/weather-check-page";
 
 type Screen = "login" | "home" | "trip-type" | "place-and-date" | "weather-check" | "build-list";
@@ -36,6 +37,7 @@ export default function App() {
     Spectral_600SemiBold,
   });
   const [screen, setScreen] = useState<Screen>("login");
+  const [tripType, setTripType] = useState<TripType | null>(null);
   const [stops, setStops] = useState<Stop[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -167,6 +169,7 @@ export default function App() {
           displayName={displayName}
           onCreateTrip={() => {
             setSelectedTripId(null);
+            setTripType(null);
             setStops([]);
             setScreen("trip-type");
           }}
@@ -190,13 +193,18 @@ export default function App() {
       )}
       {screen === "trip-type" && (
         <TripTypePage
+          initialTripType={tripType}
           onBack={() => setScreen("home")}
-          onContinue={() => setScreen("place-and-date")}
+          onContinue={(selectedTripType) => {
+            setTripType(selectedTripType);
+            setScreen("place-and-date");
+          }}
         />
       )}
       {screen === "place-and-date" && (
         <PlaceAndDatePage
           existingTrips={currentTrips}
+          initialStops={stops}
           onBack={() => setScreen("trip-type")}
           onContinue={(selectedStops) => {
             setStops(selectedStops);

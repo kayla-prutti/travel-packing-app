@@ -30,12 +30,13 @@ const tripTypeOptions: TripTypeOption[] = [
 ];
 
 type TripTypePageProps = {
+  initialTripType: TripType | null;
   onBack: () => void;
   onContinue: (tripType: TripType) => void;
 };
 
-export function TripTypePage({ onBack, onContinue }: TripTypePageProps) {
-  const [selected, setSelected] = useState<TripType | null>(null);
+export function TripTypePage({ initialTripType, onBack, onContinue }: TripTypePageProps) {
+  const [selected, setSelected] = useState<TripType | null>(initialTripType);
 
   function handleContinue() {
     if (selected) {
@@ -59,9 +60,6 @@ export function TripTypePage({ onBack, onContinue }: TripTypePageProps) {
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        onScroll={(e) => console.log("DEBUG onScroll", e.nativeEvent.contentOffset.y)}
-        onScrollBeginDrag={() => console.log("DEBUG onScrollBeginDrag")}
-        onTouchStart={() => console.log("DEBUG onTouchStart")}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}

@@ -40,3 +40,13 @@ Performance optimizations: OFF. @ http://localhost:8082/index.ts.bundle?platform
     at HMRClient._ws.onmessage (http://localhost:8082/index.ts.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=app&unstable_transformProfile=hermes-stable:1892:18)
 [ 5489428ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8082/:0
 [18802700ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8082/:0
+[20598621ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8082/:0
+[21169620ms] SyntaxError: /Users/craiglink/travel-packing-app/client/component/weather-check-page/weather-check-page.tsx: Expected corresponding JSX closing tag for <ScrollView>. (186:8)
+
+  184 |
+  185 |         
+> 186 |         </View>
+      |         ^
+  187 |       </ScrollView>
+  188 |
+  189 |       <View style={styles.footer}>

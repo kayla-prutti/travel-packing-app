@@ -175,6 +175,7 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
 
       <View style={styles.headerCopy}>
         <Text style={styles.stepLabel}>Step 4 · Build list</Text>
+        <Text style={styles.tripLabel}>{tripTitle}</Text>
         <Text style={styles.title}>Packing list</Text>
       </View>
 

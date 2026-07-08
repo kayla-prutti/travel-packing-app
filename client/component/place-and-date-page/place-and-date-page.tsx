@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -9,6 +9,7 @@ import {
   Text,
   TextInput,
   View,
+  type ScrollView as ScrollViewType,
 } from "react-native";
 import DateTimePicker, {
   type DateTimePickerEvent,
@@ -36,6 +37,7 @@ type PlaceAndDatePageProps = {
     startDate: Date;
     endDate: Date;
   }[];
+  initialStops: Stop[];
   onBack: () => void;
   onContinue: (stops: Stop[]) => void;
 };
@@ -95,10 +97,12 @@ function datesOverlap(
 
 export function PlaceAndDatePage({
   existingTrips,
+  initialStops,
   onBack,
   onContinue,
 }: PlaceAndDatePageProps) {
-  const [stops, setStops] = useState<Stop[]>([]);
+  const scrollViewRef = useRef<ScrollViewType | null>(null);
+  const [stops, setStops] = useState<Stop[]>(initialStops);
   const [cityInput, setCityInput] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -239,10 +243,11 @@ export function PlaceAndDatePage({
   }
 
   function handleEditStop(stop: Stop) {
-    Alert.alert(
-      "Edit stop",
-      `Editing ${stop.city} can be added after this screen.`
-    );
+    setCityInput(stop.weatherLocationQuery || stop.city);
+    setStartDate(stop.startDate);
+    setEndDate(stop.endDate);
+    setLocationError(null);
+    scrollViewRef.current?.scrollTo({ animated: true, y: 0 });
   }
 
   function handleContinue() {
@@ -281,6 +286,7 @@ export function PlaceAndDatePage({
         style={styles.keyboardAvoiding}
       >
         <ScrollView
+          ref={scrollViewRef}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
