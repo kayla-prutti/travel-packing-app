@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
     minHeight: 0,
   },
   scrollContent: {
-    paddingBottom: 12,
+    paddingBottom: 8,
     paddingHorizontal: 20,
   },
   stepLabel: {
@@ -67,10 +67,10 @@ export const styles = StyleSheet.create({
   newStopCard: {
     backgroundColor: "#fdf8ee",
     borderColor: "#c9502e",
-    borderRadius: 22,
+    borderRadius: 18,
     borderWidth: 2,
-    marginTop: 24,
-    padding: 18,
+    marginTop: 14,
+    padding: 14,
   },
   newStopLabel: {
     color: "#c9502e",
@@ -84,7 +84,7 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     letterSpacing: 1,
-    marginTop: 14,
+    marginTop: 10,
     textTransform: "uppercase",
   },
   cityInput: {
@@ -95,11 +95,11 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 6,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 9,
   },
   locationMessageSlot: {
     justifyContent: "center",
-    minHeight: 28,
+    minHeight: 20,
   },
   locationError: {
     color: "#c9502e",
@@ -124,7 +124,7 @@ export const styles = StyleSheet.create({
     gap: 6,
     marginTop: 6,
     paddingHorizontal: 10,
-    paddingVertical: 12,
+    paddingVertical: 9,
   },
   dateInputRowDisabled: {
     opacity: 0.45,
@@ -147,9 +147,9 @@ export const styles = StyleSheet.create({
     borderRadius: 18,
     flexDirection: "row",
     gap: 8,
-    height: 50,
+    height: 44,
     justifyContent: "center",
-    marginTop: 18,
+    marginTop: 12,
   },
   addStopButtonDisabled: {
     opacity: 0.5,
@@ -164,27 +164,14 @@ export const styles = StyleSheet.create({
   },
   stopCard: {
     backgroundColor: "#fdf8ee",
-    borderRadius: 22,
-    marginTop: 16,
-    padding: 18,
+    borderRadius: 18,
+    marginTop: 12,
+    padding: 14,
   },
   stopTopRow: {
     alignItems: "center",
     flexDirection: "row",
     gap: 10,
-  },
-  stopBadge: {
-    alignItems: "center",
-    backgroundColor: "#c9502e",
-    borderRadius: 999,
-    height: 26,
-    justifyContent: "center",
-    width: 26,
-  },
-  stopBadgeText: {
-    color: "#fff8ea",
-    fontSize: 13,
-    fontWeight: "600",
   },
   stopLabel: {
     color: "#a68a6c",
@@ -211,7 +198,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     gap: 10,
-    marginTop: 14,
+    marginTop: 10,
   },
   stopCityTextWrap: {
     flex: 1,
@@ -230,7 +217,7 @@ export const styles = StyleSheet.create({
   stopDivider: {
     backgroundColor: "#ecdec2",
     height: 1,
-    marginTop: 14,
+    marginTop: 10,
   },
   dateReadout: {
     flex: 1,
@@ -242,8 +229,8 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     flexDirection: "row",
     gap: 12,
-    marginTop: 20,
-    padding: 16,
+    marginTop: 12,
+    padding: 12,
   },
   tipText: {
     color: "#5a4632",
@@ -253,9 +240,9 @@ export const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: "#f7ecd9",
-    paddingBottom: 12,
+    paddingBottom: 10,
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 8,
   },
   continueButton: {
     alignItems: "center",
@@ -263,7 +250,7 @@ export const styles = StyleSheet.create({
     borderRadius: 24,
     flexDirection: "row",
     gap: 10,
-    height: 58,
+    height: 52,
     justifyContent: "center",
   },
   continueButtonDisabled: {

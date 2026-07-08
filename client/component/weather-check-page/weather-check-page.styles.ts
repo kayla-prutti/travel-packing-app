@@ -56,7 +56,7 @@ export const styles = StyleSheet.create({
   title: {
     color: "#2d1b12",
     fontFamily: displayFontFamily,
-    fontSize: 40,
+    fontSize: 30,
     fontWeight: "600",
     marginTop: 6,
   },

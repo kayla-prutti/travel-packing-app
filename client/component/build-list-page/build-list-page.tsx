@@ -100,7 +100,10 @@ function formatTripTitle(stops: Stop[]): string {
 }
 
 function createInitialItems(): Record<string, boolean> {
-  const allItems = [...weatherItems, ...baseSections.flatMap((section) => section.items)];
+  const allItems = [
+    ...weatherItems,
+    ...baseSections.flatMap((section) => section.items),
+  ];
   return allItems.reduce<Record<string, boolean>>((current, item) => {
     current[item.id] = item.packed;
     return current;
@@ -122,13 +125,17 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
   const tripTitle = formatTripTitle(stops);
 
   const totals = useMemo(() => {
-    const staticItems = [...weatherItems, ...baseSections.flatMap((section) => section.items)];
+    const staticItems = [
+      ...weatherItems,
+      ...baseSections.flatMap((section) => section.items),
+    ];
     const allItems = [...staticItems, ...customItems];
     const packedCount = allItems.filter((item) => packedItems[item.id]).length;
     return { packedCount, totalCount: allItems.length };
   }, [customItems, packedItems]);
 
-  const progress = totals.totalCount === 0 ? 0 : totals.packedCount / totals.totalCount;
+  const progress =
+    totals.totalCount === 0 ? 0 : totals.packedCount / totals.totalCount;
 
   function toggleItem(id: string) {
     setPackedItems((current) => ({ ...current, [id]: !current[id] }));
@@ -140,7 +147,10 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
       return;
     }
     const id = `custom-${Date.now()}`;
-    setCustomItems((current) => [...current, { id, label: trimmedInput, packed: false }]);
+    setCustomItems((current) => [
+      ...current,
+      { id, label: trimmedInput, packed: false },
+    ]);
     setPackedItems((current) => ({ ...current, [id]: false }));
     setCustomInput("");
   }
@@ -151,20 +161,31 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
+      <View style={styles.topRow}>
         <Pressable onPress={onBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={22} color="#3a2317" />
+          <Ionicons name="arrow-back" size={20} color="#3a2317" />
         </Pressable>
-        <View style={styles.headerCopy}>
-          <Text style={styles.stepLabel}>Step 4 · Build list</Text>
-          <Text style={styles.tripLabel}>{tripTitle}</Text>
-          <Text style={styles.title}>Packing list</Text>
+        <View style={styles.stepperRow}>
+          <View style={[styles.stepperSegment, styles.stepperSegmentActive]} />
+          <View style={[styles.stepperSegment, styles.stepperSegmentActive]} />
+          <View style={[styles.stepperSegment, styles.stepperSegmentActive]} />
+          <View style={[styles.stepperSegment, styles.stepperSegmentActive]} />
         </View>
+      </View>
+
+      <View style={styles.headerCopy}>
+        <Text style={styles.stepLabel}>Step 4 · Build list</Text>
+        <Text style={styles.title}>Packing list</Text>
       </View>
 
       <View style={styles.progressRow}>
         <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${Math.max(progress * 100, 8)}%` }]} />
+          <View
+            style={[
+              styles.progressFill,
+              { width: `${Math.max(progress * 100, 8)}%` },
+            ]}
+          />
         </View>
         <Text style={styles.progressText}>
           {totals.packedCount} / {totals.totalCount} packed
@@ -182,19 +203,32 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
             <Text style={styles.weatherTitle}>Because of the weather</Text>
           </View>
           <Text style={styles.weatherIntro}>
-            Extra items worth having. Skip any you&apos;d rather borrow or buy at your destination.
+            Extra items worth having. Skip any you&apos;d rather borrow or buy
+            at your destination.
           </Text>
           <View style={styles.weatherList}>
             {weatherItems.map((item) => (
-              <Pressable key={item.id} onPress={() => toggleItem(item.id)} style={styles.weatherItem}>
+              <Pressable
+                key={item.id}
+                onPress={() => toggleItem(item.id)}
+                style={styles.weatherItem}
+              >
                 <View style={styles.weatherIconWrap}>
-                  <MaterialCommunityIcons name={item.icon ?? "bag-personal-outline"} size={24} color="#c27a18" />
+                  <MaterialCommunityIcons
+                    name={item.icon ?? "bag-personal-outline"}
+                    size={24}
+                    color="#c27a18"
+                  />
                 </View>
                 <View style={styles.itemTextWrap}>
                   <Text style={styles.itemLabel}>{item.label}</Text>
                   {item.detail ? (
                     <View style={styles.itemDetailRow}>
-                      <Ionicons name="information-circle-outline" size={16} color="#c27a18" />
+                      <Ionicons
+                        name="information-circle-outline"
+                        size={16}
+                        color="#c27a18"
+                      />
                       <Text style={styles.itemDetail}>{item.detail}</Text>
                     </View>
                   ) : null}
@@ -210,7 +244,11 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
             <Text style={styles.sectionLabel}>{section.title}</Text>
             <View style={styles.basicList}>
               {section.items.map((item) => (
-                <Pressable key={item.id} onPress={() => toggleItem(item.id)} style={styles.basicItem}>
+                <Pressable
+                  key={item.id}
+                  onPress={() => toggleItem(item.id)}
+                  style={styles.basicItem}
+                >
                   <CheckCircle checked={!!packedItems[item.id]} />
                   <Text style={styles.basicItemText}>{item.label}</Text>
                 </Pressable>
@@ -224,7 +262,11 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
           {customItems.length > 0 ? (
             <View style={styles.basicList}>
               {customItems.map((item) => (
-                <Pressable key={item.id} onPress={() => toggleItem(item.id)} style={styles.basicItem}>
+                <Pressable
+                  key={item.id}
+                  onPress={() => toggleItem(item.id)}
+                  style={styles.basicItem}
+                >
                   <CheckCircle checked={!!packedItems[item.id]} />
                   <Text style={styles.basicItemText}>{item.label}</Text>
                 </Pressable>
@@ -246,16 +288,25 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
               <Ionicons name="arrow-up" size={30} color="#fff8ea" />
             </Pressable>
           </View>
-          <Text style={styles.helperText}>No need to tick it all now — come back and pack whenever.</Text>
+          <Text style={styles.helperText}>
+            No need to tick it all now — come back and pack whenever.
+          </Text>
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
         <Pressable
           onPress={handleFinish}
-          style={({ pressed }) => [styles.saveButton, pressed && styles.saveButtonPressed]}
+          style={({ pressed }) => [
+            styles.saveButton,
+            pressed && styles.saveButtonPressed,
+          ]}
         >
-          <MaterialCommunityIcons name="map-check-outline" size={24} color="#fff8ea" />
+          <MaterialCommunityIcons
+            name="map-check-outline"
+            size={24}
+            color="#fff8ea"
+          />
           <Text style={styles.saveButtonText}>Save list & finish</Text>
         </Pressable>
       </View>

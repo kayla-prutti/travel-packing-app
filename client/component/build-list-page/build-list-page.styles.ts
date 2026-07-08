@@ -8,12 +8,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     minHeight: 0,
   },
-  header: {
+  topRow: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 18,
+    gap: 14,
     paddingHorizontal: 20,
-    paddingTop: 14,
+    paddingTop: 12,
   },
   backButton: {
     alignItems: "center",
@@ -21,19 +21,33 @@ export const styles = StyleSheet.create({
     borderColor: "#ecd7b4",
     borderRadius: 16,
     borderWidth: 1,
-    height: 52,
+    height: 44,
     justifyContent: "center",
-    width: 52,
+    width: 44,
+  },
+  stepperRow: {
+    flex: 1,
+    flexDirection: "row",
+    gap: 8,
+  },
+  stepperSegment: {
+    backgroundColor: "#ecdcc0",
+    borderRadius: 999,
+    flex: 1,
+    height: 5,
+  },
+  stepperSegmentActive: {
+    backgroundColor: "#c9502e",
   },
   headerCopy: {
-    flex: 1,
+    paddingHorizontal: 20,
   },
   stepLabel: {
-    color: "#c9502e",
-    fontSize: 12,
+    color: "#d98a3d",
+    fontSize: 13,
     fontWeight: "600",
     letterSpacing: 1.2,
-    marginBottom: 4,
+    marginTop: 22,
     textTransform: "uppercase",
   },
   tripLabel: {
@@ -46,16 +60,16 @@ export const styles = StyleSheet.create({
   title: {
     color: "#2d1b12",
     fontFamily: displayFontFamily,
-    fontSize: 34,
+    fontSize: 30,
     fontWeight: "600",
-    marginTop: 4,
+    marginTop: 6,
   },
   progressRow: {
     alignItems: "center",
     flexDirection: "row",
     gap: 14,
     paddingHorizontal: 20,
-    paddingTop: 30,
+    paddingTop: 24,
   },
   progressTrack: {
     backgroundColor: "#eadbbf",
