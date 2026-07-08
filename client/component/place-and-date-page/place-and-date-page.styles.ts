@@ -126,6 +126,9 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 12,
   },
+  dateInputRowDisabled: {
+    opacity: 0.45,
+  },
   dateValueText: {
     color: "#2d1b12",
     flex: 1,

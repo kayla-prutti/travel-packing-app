@@ -39,12 +39,19 @@ function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
-function formatNights(startDate: Date, endDate: Date): string {
-  const nights = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  if (nights <= 0) {
-    return "";
-  }
-  return `${nights} night${nights === 1 ? "" : "s"}`;
+function startOfDay(date: Date): Date {
+  const day = new Date(date);
+  day.setHours(0, 0, 0, 0);
+  return day;
+}
+
+function formatTripLength(startDate: Date, endDate: Date): string {
+  const days = Math.max(
+    1,
+    Math.round((startOfDay(endDate).getTime() - startOfDay(startDate).getTime()) / (1000 * 60 * 60 * 24)) +
+      1,
+  );
+  return `${days} day${days === 1 ? "" : "s"} trip`;
 }
 
 export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) {
@@ -55,9 +62,13 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
   const [activeField, setActiveField] = useState<ActiveField>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isCheckingLocation, setIsCheckingLocation] = useState(false);
+  const today = startOfDay(new Date());
 
   const canAddStop =
-    cityInput.trim() !== "" && startDate !== null && endDate !== null && endDate > startDate;
+    cityInput.trim() !== "" &&
+    startDate !== null &&
+    endDate !== null &&
+    startOfDay(endDate) >= startOfDay(startDate);
 
   function handleDateChange(event: DateTimePickerEvent, selectedDate: Date | undefined) {
     const field = activeField;
@@ -69,9 +80,22 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
     }
     if (field === "startDate") {
       setStartDate(selectedDate);
+      if (endDate && endDate < selectedDate) {
+        setEndDate(null);
+      }
     } else {
       setEndDate(selectedDate);
     }
+  }
+
+  function handleConfirmDateSelection() {
+    if (activeField === "startDate") {
+      setStartDate(pickerValue);
+    }
+    if (activeField === "endDate") {
+      setEndDate(pickerValue);
+    }
+    setActiveField(null);
   }
 
   async function handleAddStop() {
@@ -126,7 +150,9 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
     }
   }
 
-  const pickerValue = (activeField === "startDate" ? startDate : endDate) ?? new Date();
+  const pickerValue =
+    activeField === "endDate" ? endDate ?? startDate ?? today : startDate ?? today;
+  const pickerMinimumDate = activeField === "endDate" && startDate ? startDate : today;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -185,10 +211,14 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
               </View>
               <View style={styles.dateField}>
                 <Text style={styles.fieldLabel}>End date</Text>
-                <Pressable onPress={() => setActiveField("endDate")} style={styles.dateInputRow}>
+                <Pressable
+                  disabled={!startDate}
+                  onPress={() => setActiveField("endDate")}
+                  style={[styles.dateInputRow, !startDate && styles.dateInputRowDisabled]}
+                >
                   <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
                   <Text style={endDate ? styles.dateValueText : styles.datePlaceholderText}>
-                    {endDate ? formatDate(endDate) : "Select date"}
+                    {endDate ? formatDate(endDate) : startDate ? "Select date" : "Choose start first"}
                   </Text>
                 </Pressable>
               </View>
@@ -217,7 +247,7 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
                   <Text style={styles.stopBadgeText}>{index + 1}</Text>
                 </View>
                 <Text style={styles.stopLabel}>Stop {index + 1}</Text>
-                <Text style={styles.nightsText}>{formatNights(stop.startDate, stop.endDate)}</Text>
+                <Text style={styles.nightsText}>{formatTripLength(stop.startDate, stop.endDate)}</Text>
                 <Pressable
                   accessibilityLabel={`Delete ${stop.city}`}
                   hitSlop={8}
@@ -289,7 +319,12 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
       </View>
 
       {activeField && Platform.OS === "android" ? (
-        <DateTimePicker mode="date" onChange={handleDateChange} value={pickerValue} />
+        <DateTimePicker
+          minimumDate={pickerMinimumDate}
+          mode="date"
+          onChange={handleDateChange}
+          value={pickerValue}
+        />
       ) : null}
 
       {activeField && Platform.OS === "ios" ? (
@@ -298,11 +333,12 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
             <View style={styles.pickerSheet}>
               <DateTimePicker
                 display="spinner"
+                minimumDate={pickerMinimumDate}
                 mode="date"
                 onChange={handleDateChange}
                 value={pickerValue}
               />
-              <Pressable onPress={() => setActiveField(null)} style={styles.pickerDoneButton}>
+              <Pressable onPress={handleConfirmDateSelection} style={styles.pickerDoneButton}>
                 <Text style={styles.pickerDoneText}>Done</Text>
               </Pressable>
             </View>
