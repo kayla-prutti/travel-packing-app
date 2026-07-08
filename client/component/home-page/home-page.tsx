@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { FlatList, Modal, Pressable, Text, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import type { Stop } from "../place-and-date-page/place-and-date-page";
 import type { TripType } from "../trip-type-page/trip-type-page";
+import type { PackingItem } from "../build-list-page/build-list-page";
+import type { WeatherPackingItem } from "../../src/weather/forecast";
 import { styles } from "./home-page.styles";
 
 type PackedStatus = { packed: number; total: number } | "not-started";
@@ -14,11 +19,14 @@ export type Trip = {
   name: string;
   location: string;
   dateRange: string;
+  customItems: PackingItem[];
   startDate: Date;
   endDate: Date;
+  packedItems: Record<string, boolean>;
   stops: Stop[];
   tripType: TripType | null;
   weatherAvailable: boolean;
+  weatherPackingItems: WeatherPackingItem[];
   weatherIcon: "rainy" | "snow";
   weatherRange: string;
   packedStatus: PackedStatus;
@@ -103,8 +111,13 @@ export function HomePage({
         transparent
         visible={menuOpen}
       >
-        <Pressable onPress={() => setMenuOpen(false)} style={styles.menuBackdrop}>
-          <View style={[styles.accountMenu, { top: insets.top + 68, right: 20 }]}>
+        <Pressable
+          onPress={() => setMenuOpen(false)}
+          style={styles.menuBackdrop}
+        >
+          <View
+            style={[styles.accountMenu, { top: insets.top + 68, right: 20 }]}
+          >
             <Text style={styles.accountName}>{displayName}</Text>
             <Text style={styles.accountEmail}>{accountEmail}</Text>
             <View style={styles.accountDivider} />
@@ -123,20 +136,25 @@ export function HomePage({
         visible={deleteTarget !== null}
       >
         <Pressable onPress={cancelDeleteTrip} style={styles.confirmBackdrop}>
-          <View style={[styles.confirmSheet, { paddingBottom: insets.bottom + 18 }]}>
+          <View
+            style={[styles.confirmSheet, { paddingBottom: insets.bottom + 18 }]}
+          >
             <View style={styles.confirmIconWrap}>
               <Ionicons name="trash-outline" size={22} color="#c9502e" />
             </View>
             <Text style={styles.confirmTitle}>Delete this trip?</Text>
             <Text style={styles.confirmMessage}>
-              &quot;{deleteTarget?.name}&quot; and its packing list will be removed. This can&apos;t be
-              undone.
+              &quot;{deleteTarget?.name}&quot; and its packing list will be
+              removed. This can&apos;t be undone.
             </Text>
             <View style={styles.confirmActions}>
               <Pressable onPress={cancelDeleteTrip} style={styles.cancelButton}>
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </Pressable>
-              <Pressable onPress={confirmDeleteTrip} style={styles.deleteConfirmButton}>
+              <Pressable
+                onPress={confirmDeleteTrip}
+                style={styles.deleteConfirmButton}
+              >
                 <Text style={styles.deleteConfirmButtonText}>Delete</Text>
               </Pressable>
             </View>
@@ -150,10 +168,14 @@ export function HomePage({
         keyExtractor={(trip) => trip.id}
         ListFooterComponent={
           <View style={styles.addTripPrompt}>
-            <MaterialCommunityIcons name="bag-suitcase-outline" size={22} color="#c9502e" />
+            <MaterialCommunityIcons
+              name="bag-suitcase-outline"
+              size={22}
+              color="#c9502e"
+            />
             <Text style={styles.addTripPromptText}>
-              Add a trip and PackSmart builds your list in seconds — tick things off whenever
-              you pack.
+              Add a trip and PackSmart builds your list in seconds — tick things
+              off whenever you pack.
             </Text>
           </View>
         }
@@ -170,7 +192,11 @@ export function HomePage({
               <View style={styles.cardTopActions}>
                 <View style={styles.weatherPill}>
                   <Ionicons
-                    name={item.weatherIcon === "rainy" ? "rainy-outline" : "snow-outline"}
+                    name={
+                      item.weatherIcon === "rainy"
+                        ? "rainy-outline"
+                        : "snow-outline"
+                    }
                     size={14}
                     color="#c9502e"
                   />
@@ -205,7 +231,11 @@ export function HomePage({
                 </View>
               ) : (
                 <View style={styles.statusRow}>
-                  <MaterialCommunityIcons name="format-list-checks" size={16} color="#9c8266" />
+                  <MaterialCommunityIcons
+                    name="format-list-checks"
+                    size={16}
+                    color="#9c8266"
+                  />
                   <Text style={styles.statusText}>
                     {item.packedStatus.packed}/{item.packedStatus.total} packed
                   </Text>
@@ -221,7 +251,10 @@ export function HomePage({
       <View style={styles.footer}>
         <Pressable
           onPress={onCreateTrip}
-          style={({ pressed }) => [styles.createButton, pressed && styles.createButtonPressed]}
+          style={({ pressed }) => [
+            styles.createButton,
+            pressed && styles.createButtonPressed,
+          ]}
         >
           <Ionicons name="add" size={22} color="#fff8ea" />
           <Text style={styles.createButtonText}>Create new trip</Text>

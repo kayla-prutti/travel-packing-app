@@ -60,3 +60,5 @@ Performance optimizations: OFF. @ http://localhost:8082/index.ts.bundle?platform
   281 |       { id: "moisturiser", label: "Moisturiser", packed: false },
   282 |       { id: "lip-balm", label: "Lip balm", packed: false },
 [21828357ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8082/:0
+[22878002ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8082/:0
+[23472231ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8082/:0

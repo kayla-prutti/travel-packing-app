@@ -13,13 +13,17 @@ import type { Stop } from "../place-and-date-page/place-and-date-page";
 import {
   fetchTripForecast,
   type TripForecastResult,
+  type WeatherPackingItem,
 } from "../../src/weather/forecast";
 import { styles } from "./weather-check-page.styles";
 
 type WeatherCheckPageProps = {
   onBuildPackingList: () => void;
   onBack: () => void;
-  onWeatherAvailabilityChange: (available: boolean) => void;
+  onWeatherAvailabilityChange: (
+    available: boolean,
+    weatherPackingItems: WeatherPackingItem[]
+  ) => void;
   stops: Stop[];
 };
 
@@ -69,7 +73,13 @@ export function WeatherCheckPage({
     fetchTripForecast(stops).then((result) => {
       if (isMounted) {
         setForecastState({ key: forecastRequestKey, result });
-        onWeatherAvailabilityChange(result.status === "available");
+        onWeatherAvailabilityChange(
+          result.status === "available" &&
+            result.forecast.suggestedPackingItems.length > 0,
+          result.status === "available"
+            ? result.forecast.suggestedPackingItems
+            : []
+        );
       }
     });
     return () => {

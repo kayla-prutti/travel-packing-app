@@ -16,6 +16,7 @@ import { HomePage } from "./component/home-page/home-page";
 import type { Trip } from "./component/home-page/home-page";
 import { LoginPage } from "./component/login-page/login-page";
 import { BuildListPage } from "./component/build-list-page/build-list-page";
+import type { PackingItem } from "./component/build-list-page/build-list-page";
 import { PlaceAndDatePage } from "./component/place-and-date-page/place-and-date-page";
 import type { Stop } from "./component/place-and-date-page/place-and-date-page";
 import { signOut } from "./src/auth/auth-client";
@@ -24,8 +25,15 @@ import { configureTypographyDefaults } from "./src/theme/typography";
 import { TripTypePage } from "./component/trip-type-page/trip-type-page";
 import type { TripType } from "./component/trip-type-page/trip-type-page";
 import { WeatherCheckPage } from "./component/weather-check-page/weather-check-page";
+import type { WeatherPackingItem } from "./src/weather/forecast";
 
-type Screen = "login" | "home" | "trip-type" | "place-and-date" | "weather-check" | "build-list";
+type Screen =
+  | "login"
+  | "home"
+  | "trip-type"
+  | "place-and-date"
+  | "weather-check"
+  | "build-list";
 
 export default function App() {
   const [instrumentSansLoaded] = useInstrumentSansFonts({
@@ -40,6 +48,11 @@ export default function App() {
   const [tripType, setTripType] = useState<TripType | null>(null);
   const [stops, setStops] = useState<Stop[]>([]);
   const [weatherAvailable, setWeatherAvailable] = useState(false);
+  const [weatherPackingItems, setWeatherPackingItems] = useState<
+    WeatherPackingItem[]
+  >([]);
+  const [packedItems, setPackedItems] = useState<Record<string, boolean>>({});
+  const [customItems, setCustomItems] = useState<PackingItem[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [tripsByUser, setTripsByUser] = useState<Record<string, Trip[]>>({});
@@ -48,6 +61,25 @@ export default function App() {
   const currentTrips = currentUserId ? tripsByUser[currentUserId] ?? [] : [];
   const accountEmail = session?.user.email ?? "";
   const displayName = accountEmail ? accountEmail.split("@")[0] : "Traveler";
+
+  function formatTripTypeLabel(selectedTripType: TripType | null): string {
+    switch (selectedTripType) {
+      case "hiking":
+        return "Hiking";
+      case "city":
+        return "City";
+      case "beach-town":
+        return "Beach";
+      case "business":
+        return "Business";
+      case "ski":
+        return "Ski";
+      case "backpacking":
+        return "Backpacking";
+      default:
+        return "Trip";
+    }
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -59,10 +91,12 @@ export default function App() {
       }
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setScreen(session ? "home" : "login");
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setScreen(session ? "home" : "login");
+      }
+    );
 
     return () => {
       isMounted = false;
@@ -75,7 +109,7 @@ export default function App() {
     if (!firstStop) {
       return "New Trip";
     }
-    return `${firstStop.city} City Break`;
+    return `${firstStop.city} ${formatTripTypeLabel(tripType)} Trip`;
   }
 
   function formatTripLocation(selectedStops: Stop[]): string {
@@ -86,12 +120,18 @@ export default function App() {
     return firstStop.weatherLocationQuery || firstStop.city;
   }
 
-  function getTripDateBounds(selectedStops: Stop[]): { start: Date; end: Date } | null {
+  function getTripDateBounds(
+    selectedStops: Stop[]
+  ): { start: Date; end: Date } | null {
     if (selectedStops.length === 0) {
       return null;
     }
-    const sortedStarts = [...selectedStops].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
-    const sortedEnds = [...selectedStops].sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
+    const sortedStarts = [...selectedStops].sort(
+      (a, b) => a.startDate.getTime() - b.startDate.getTime()
+    );
+    const sortedEnds = [...selectedStops].sort(
+      (a, b) => b.endDate.getTime() - a.endDate.getTime()
+    );
     return {
       start: sortedStarts[0].startDate,
       end: sortedEnds[0].endDate,
@@ -104,20 +144,36 @@ export default function App() {
       return "Dates pending";
     }
     const { start, end } = bounds;
-    const startText = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const startText = start.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
     const endText = end.toLocaleDateString("en-US", { day: "numeric" });
     return `${startText} – ${endText}`;
   }
 
-  function saveTrip(packedStatus: { packed: number; total: number }) {
+  function saveTrip(packingState: {
+    customItems: PackingItem[];
+    packedItems: Record<string, boolean>;
+    packedStatus: { packed: number; total: number };
+  }) {
     if (selectedTripId && currentUserId) {
       setTripsByUser((current) => ({
         ...current,
         [currentUserId]: (current[currentUserId] ?? []).map((trip) =>
-          trip.id === selectedTripId ? { ...trip, packedStatus } : trip,
+          trip.id === selectedTripId
+            ? {
+                ...trip,
+                customItems: packingState.customItems,
+                packedItems: packingState.packedItems,
+                packedStatus: packingState.packedStatus,
+              }
+            : trip
         ),
       }));
       setSelectedTripId(null);
+      setCustomItems([]);
+      setPackedItems({});
       setStops([]);
       setScreen("home");
       return;
@@ -133,14 +189,17 @@ export default function App() {
       name: formatTripName(stops),
       location: formatTripLocation(stops),
       dateRange: formatDateRange(stops),
+      customItems: packingState.customItems,
       startDate: dateBounds.start,
       endDate: dateBounds.end,
+      packedItems: packingState.packedItems,
       stops,
       tripType,
       weatherAvailable,
+      weatherPackingItems,
       weatherIcon: "rainy",
       weatherRange: "1–8°",
-      packedStatus,
+      packedStatus: packingState.packedStatus,
     };
     if (currentUserId) {
       setTripsByUser((current) => ({
@@ -149,6 +208,8 @@ export default function App() {
       }));
     }
     setStops([]);
+    setCustomItems([]);
+    setPackedItems({});
     setScreen("home");
   }
 
@@ -157,9 +218,13 @@ export default function App() {
     setScreen("login");
   }
 
-  const handleWeatherAvailabilityChange = useCallback((available: boolean) => {
-    setWeatherAvailable(available);
-  }, []);
+  const handleWeatherAvailabilityChange = useCallback(
+    (available: boolean, items: WeatherPackingItem[]) => {
+      setWeatherAvailable(available);
+      setWeatherPackingItems(items);
+    },
+    []
+  );
 
   if (!instrumentSansLoaded || !spectralLoaded) {
     return null;
@@ -179,6 +244,9 @@ export default function App() {
             setTripType(null);
             setStops([]);
             setWeatherAvailable(false);
+            setWeatherPackingItems([]);
+            setCustomItems([]);
+            setPackedItems({});
             setScreen("trip-type");
           }}
           onDeleteTrip={(id) => {
@@ -187,7 +255,9 @@ export default function App() {
             }
             setTripsByUser((current) => ({
               ...current,
-              [currentUserId]: (current[currentUserId] ?? []).filter((trip) => trip.id !== id),
+              [currentUserId]: (current[currentUserId] ?? []).filter(
+                (trip) => trip.id !== id
+              ),
             }));
           }}
           onLogout={handleLogout}
@@ -196,6 +266,9 @@ export default function App() {
             setTripType(trip.tripType);
             setStops(trip.stops);
             setWeatherAvailable(trip.weatherAvailable);
+            setWeatherPackingItems(trip.weatherPackingItems);
+            setCustomItems(trip.customItems);
+            setPackedItems(trip.packedItems);
             setScreen("build-list");
           }}
           trips={currentTrips}
@@ -219,6 +292,9 @@ export default function App() {
           onContinue={(selectedStops) => {
             setStops(selectedStops);
             setWeatherAvailable(false);
+            setWeatherPackingItems([]);
+            setCustomItems([]);
+            setPackedItems({});
             setScreen("weather-check");
           }}
         />
@@ -235,9 +311,12 @@ export default function App() {
         <BuildListPage
           onBack={() => setScreen(selectedTripId ? "home" : "weather-check")}
           onFinish={saveTrip}
+          initialCustomItems={customItems}
+          initialPackedItems={packedItems}
           stops={stops}
           tripType={tripType}
           weatherAvailable={weatherAvailable}
+          weatherPackingItems={weatherPackingItems}
         />
       )}
     </SafeAreaProvider>

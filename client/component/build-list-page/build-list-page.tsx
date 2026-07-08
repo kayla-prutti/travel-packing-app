@@ -5,17 +5,25 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import type { Stop } from "../place-and-date-page/place-and-date-page";
 import type { TripType } from "../trip-type-page/trip-type-page";
+import type { WeatherPackingItem } from "../../src/weather/forecast";
 import { styles } from "./build-list-page.styles";
 
 type BuildListPageProps = {
   onBack: () => void;
-  onFinish: (packedStatus: { packed: number; total: number }) => void;
+  initialCustomItems: PackingItem[];
+  initialPackedItems: Record<string, boolean>;
+  onFinish: (packingState: {
+    customItems: PackingItem[];
+    packedItems: Record<string, boolean>;
+    packedStatus: { packed: number; total: number };
+  }) => void;
   stops: Stop[];
   tripType: TripType | null;
   weatherAvailable: boolean;
+  weatherPackingItems: WeatherPackingItem[];
 };
 
-type PackingItem = {
+export type PackingItem = {
   id: string;
   label: string;
   detail?: string;
@@ -27,37 +35,6 @@ type PackingSection = {
   title: string;
   items: PackingItem[];
 };
-
-const weatherItems: PackingItem[] = [
-  {
-    id: "rain-jacket",
-    label: "Waterproof rain jacket",
-    detail: "Rain forecast on 4 of 7 days",
-    icon: "weather-pouring",
-    packed: true,
-  },
-  {
-    id: "thermal-layer",
-    label: "Thermal base layer",
-    detail: "Lows near 0-2° at night",
-    icon: "snowflake",
-    packed: true,
-  },
-  {
-    id: "umbrella",
-    label: "Compact umbrella",
-    detail: "Heavy showers midweek",
-    icon: "umbrella-outline",
-    packed: false,
-  },
-  {
-    id: "waterproof-boots",
-    label: "Waterproof boots",
-    detail: "Wet streets all week",
-    icon: "water-outline",
-    packed: false,
-  },
-];
 
 const sharedSections: PackingSection[] = [
   {
@@ -84,8 +61,16 @@ const tripTypeSections: Record<TripType, PackingSection[]> = {
       title: "Trail gear",
       items: [
         { id: "hiking-daypack", label: "Daypack", packed: false },
-        { id: "hiking-water-bottle", label: "Water bottle or hydration bladder", packed: false },
-        { id: "hiking-navigation", label: "Map or offline trail app", packed: false },
+        {
+          id: "hiking-water-bottle",
+          label: "Water bottle or hydration bladder",
+          packed: false,
+        },
+        {
+          id: "hiking-navigation",
+          label: "Map or offline trail app",
+          packed: false,
+        },
         { id: "hiking-first-aid", label: "Small first-aid kit", packed: false },
       ],
     },
@@ -102,7 +87,11 @@ const tripTypeSections: Record<TripType, PackingSection[]> = {
     {
       title: "City days",
       items: [
-        { id: "city-walking-shoes", label: "Comfortable walking shoes", packed: false },
+        {
+          id: "city-walking-shoes",
+          label: "Comfortable walking shoes",
+          packed: false,
+        },
         { id: "city-day-bag", label: "Small day bag", packed: false },
         { id: "city-outfit", label: "Dinner outfit", packed: false },
         { id: "city-sunglasses", label: "Sunglasses", packed: false },
@@ -112,7 +101,11 @@ const tripTypeSections: Record<TripType, PackingSection[]> = {
       title: "Clothing",
       items: [
         { id: "city-tops", label: "Tops for each day", packed: false },
-        { id: "city-bottoms", label: "Trousers, jeans, or skirt", packed: false },
+        {
+          id: "city-bottoms",
+          label: "Trousers, jeans, or skirt",
+          packed: false,
+        },
         { id: "city-sleepwear", label: "Sleepwear", packed: false },
       ],
     },
@@ -122,7 +115,11 @@ const tripTypeSections: Record<TripType, PackingSection[]> = {
       title: "Beach gear",
       items: [
         { id: "beach-swimwear", label: "Swimwear", packed: false },
-        { id: "beach-coverup", label: "Cover-up or light shirt", packed: false },
+        {
+          id: "beach-coverup",
+          label: "Cover-up or light shirt",
+          packed: false,
+        },
         { id: "beach-sandals", label: "Sandals", packed: false },
         { id: "beach-dry-bag", label: "Wet/dry bag", packed: false },
       ],
@@ -141,8 +138,16 @@ const tripTypeSections: Record<TripType, PackingSection[]> = {
       title: "Work essentials",
       items: [
         { id: "business-laptop", label: "Laptop", packed: false },
-        { id: "business-laptop-charger", label: "Laptop charger", packed: false },
-        { id: "business-notebook", label: "Notebook or meeting notes", packed: false },
+        {
+          id: "business-laptop-charger",
+          label: "Laptop charger",
+          packed: false,
+        },
+        {
+          id: "business-notebook",
+          label: "Notebook or meeting notes",
+          packed: false,
+        },
         { id: "business-cards", label: "Business cards", packed: false },
       ],
     },
@@ -179,7 +184,11 @@ const tripTypeSections: Record<TripType, PackingSection[]> = {
       title: "Backpacking gear",
       items: [
         { id: "backpacking-pack", label: "Backpack", packed: false },
-        { id: "backpacking-packing-cubes", label: "Packing cubes or stuff sacks", packed: false },
+        {
+          id: "backpacking-packing-cubes",
+          label: "Packing cubes or stuff sacks",
+          packed: false,
+        },
         { id: "backpacking-lock", label: "Travel lock", packed: false },
         { id: "backpacking-laundry", label: "Laundry bag", packed: false },
       ],
@@ -187,9 +196,21 @@ const tripTypeSections: Record<TripType, PackingSection[]> = {
     {
       title: "Flexible clothing",
       items: [
-        { id: "backpacking-quick-dry", label: "Quick-dry shirts", packed: false },
-        { id: "backpacking-versatile-bottoms", label: "Versatile bottoms", packed: false },
-        { id: "backpacking-light-jacket", label: "Light jacket", packed: false },
+        {
+          id: "backpacking-quick-dry",
+          label: "Quick-dry shirts",
+          packed: false,
+        },
+        {
+          id: "backpacking-versatile-bottoms",
+          label: "Versatile bottoms",
+          packed: false,
+        },
+        {
+          id: "backpacking-light-jacket",
+          label: "Light jacket",
+          packed: false,
+        },
       ],
     },
   ],
@@ -224,23 +245,51 @@ function getBaseSections(tripType: TripType | null): PackingSection[] {
   ];
 }
 
-function getAllStaticItems(sections: PackingSection[], includeWeatherItems: boolean) {
-  return [
-    ...(includeWeatherItems ? weatherItems : []),
-    ...sections.flatMap((section) => section.items),
-  ];
+function getAllStaticItems(
+  sections: PackingSection[],
+  weatherItems: PackingItem[]
+) {
+  return [...weatherItems, ...sections.flatMap((section) => section.items)];
 }
 
-function formatTripTitle(stops: Stop[]): string {
+function toPackingItems(
+  weatherPackingItems: WeatherPackingItem[]
+): PackingItem[] {
+  return weatherPackingItems.map((item) => ({ ...item, packed: false }));
+}
+
+function formatTripTypeLabel(tripType: TripType | null): string {
+  switch (tripType) {
+    case "hiking":
+      return "hiking";
+    case "city":
+      return "city";
+    case "beach-town":
+      return "beach";
+    case "business":
+      return "business";
+    case "ski":
+      return "ski";
+    case "backpacking":
+      return "backpacking";
+    default:
+      return "trip";
+  }
+}
+
+function formatTripTitle(stops: Stop[], tripType: TripType | null): string {
   const firstStop = stops[0];
   if (!firstStop) {
     return "Trip packing";
   }
-  return `${firstStop.city} city break`;
+  return `${firstStop.city} ${formatTripTypeLabel(tripType)} trip`;
 }
 
-function createInitialItems(sections: PackingSection[], includeWeatherItems: boolean): Record<string, boolean> {
-  const allItems = getAllStaticItems(sections, includeWeatherItems);
+function createInitialItems(
+  sections: PackingSection[],
+  weatherItems: PackingItem[]
+): Record<string, boolean> {
+  const allItems = getAllStaticItems(sections, weatherItems);
   return allItems.reduce<Record<string, boolean>>((current, item) => {
     current[item.id] = false;
     return current;
@@ -261,19 +310,30 @@ export function BuildListPage({
   stops,
   tripType,
   weatherAvailable,
+  weatherPackingItems,
+  initialCustomItems,
+  initialPackedItems,
 }: BuildListPageProps) {
   const baseSections = useMemo(() => getBaseSections(tripType), [tripType]);
-  const [packedItems, setPackedItems] = useState(() => createInitialItems(baseSections, weatherAvailable));
-  const [customItems, setCustomItems] = useState<PackingItem[]>([]);
+  const weatherItems = useMemo(
+    () => (weatherAvailable ? toPackingItems(weatherPackingItems) : []),
+    [weatherAvailable, weatherPackingItems]
+  );
+  const [packedItems, setPackedItems] = useState(() => ({
+    ...createInitialItems(baseSections, weatherItems),
+    ...initialPackedItems,
+  }));
+  const [customItems, setCustomItems] =
+    useState<PackingItem[]>(initialCustomItems);
   const [customInput, setCustomInput] = useState("");
-  const tripTitle = formatTripTitle(stops);
+  const tripTitle = formatTripTitle(stops, tripType);
 
   const totals = useMemo(() => {
-    const staticItems = getAllStaticItems(baseSections, weatherAvailable);
+    const staticItems = getAllStaticItems(baseSections, weatherItems);
     const allItems = [...staticItems, ...customItems];
     const packedCount = allItems.filter((item) => packedItems[item.id]).length;
     return { packedCount, totalCount: allItems.length };
-  }, [baseSections, customItems, packedItems, weatherAvailable]);
+  }, [baseSections, customItems, packedItems, weatherItems]);
 
   const progress =
     totals.totalCount === 0 ? 0 : totals.packedCount / totals.totalCount;
@@ -297,7 +357,11 @@ export function BuildListPage({
   }
 
   function handleFinish() {
-    onFinish({ packed: totals.packedCount, total: totals.totalCount });
+    onFinish({
+      customItems,
+      packedItems,
+      packedStatus: { packed: totals.packedCount, total: totals.totalCount },
+    });
   }
 
   return (
@@ -339,7 +403,7 @@ export function BuildListPage({
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
       >
-        {weatherAvailable ? (
+        {weatherItems.length > 0 ? (
           <View style={styles.weatherSection}>
             <View style={styles.weatherHeadingRow}>
               <Text style={styles.weatherBang}>!</Text>
