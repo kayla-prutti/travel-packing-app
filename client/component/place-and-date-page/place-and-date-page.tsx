@@ -24,8 +24,8 @@ export type Stop = {
   latitude: number;
   longitude: number;
   weatherLocationQuery: string;
-  arrive: Date;
-  leave: Date;
+  startDate: Date;
+  endDate: Date;
 };
 
 type PlaceAndDatePageProps = {
@@ -33,14 +33,14 @@ type PlaceAndDatePageProps = {
   onContinue: (stops: Stop[]) => void;
 };
 
-type ActiveField = "arrive" | "leave" | null;
+type ActiveField = "startDate" | "endDate" | null;
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
-function formatNights(arrive: Date, leave: Date): string {
-  const nights = Math.round((leave.getTime() - arrive.getTime()) / (1000 * 60 * 60 * 24));
+function formatNights(startDate: Date, endDate: Date): string {
+  const nights = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   if (nights <= 0) {
     return "";
   }
@@ -50,14 +50,14 @@ function formatNights(arrive: Date, leave: Date): string {
 export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) {
   const [stops, setStops] = useState<Stop[]>([]);
   const [cityInput, setCityInput] = useState("");
-  const [arriveDate, setArriveDate] = useState<Date | null>(null);
-  const [leaveDate, setLeaveDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [activeField, setActiveField] = useState<ActiveField>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isCheckingLocation, setIsCheckingLocation] = useState(false);
 
   const canAddStop =
-    cityInput.trim() !== "" && arriveDate !== null && leaveDate !== null && leaveDate > arriveDate;
+    cityInput.trim() !== "" && startDate !== null && endDate !== null && endDate > startDate;
 
   function handleDateChange(event: DateTimePickerEvent, selectedDate: Date | undefined) {
     const field = activeField;
@@ -67,15 +67,15 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
     if (event.type === "dismissed" || !selectedDate || !field) {
       return;
     }
-    if (field === "arrive") {
-      setArriveDate(selectedDate);
+    if (field === "startDate") {
+      setStartDate(selectedDate);
     } else {
-      setLeaveDate(selectedDate);
+      setEndDate(selectedDate);
     }
   }
 
   async function handleAddStop() {
-    if (!canAddStop || !arriveDate || !leaveDate) {
+    if (!canAddStop || !startDate || !endDate) {
       return;
     }
     setLocationError(null);
@@ -98,13 +98,13 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
           latitude: location.latitude,
           longitude: location.longitude,
           weatherLocationQuery,
-          arrive: arriveDate,
-          leave: leaveDate,
+          startDate,
+          endDate,
         },
       ]);
       setCityInput("");
-      setArriveDate(null);
-      setLeaveDate(null);
+      setStartDate(null);
+      setEndDate(null);
     } catch (error) {
       setLocationError(error instanceof Error ? error.message : "Unable to check that location right now.");
     } finally {
@@ -126,7 +126,7 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
     }
   }
 
-  const pickerValue = (activeField === "arrive" ? arriveDate : leaveDate) ?? new Date();
+  const pickerValue = (activeField === "startDate" ? startDate : endDate) ?? new Date();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -175,20 +175,20 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
 
             <View style={styles.dateRow}>
               <View style={styles.dateField}>
-                <Text style={styles.fieldLabel}>Arrive</Text>
-                <Pressable onPress={() => setActiveField("arrive")} style={styles.dateInputRow}>
+                <Text style={styles.fieldLabel}>Start date</Text>
+                <Pressable onPress={() => setActiveField("startDate")} style={styles.dateInputRow}>
                   <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                  <Text style={arriveDate ? styles.dateValueText : styles.datePlaceholderText}>
-                    {arriveDate ? formatDate(arriveDate) : "Select date"}
+                  <Text style={startDate ? styles.dateValueText : styles.datePlaceholderText}>
+                    {startDate ? formatDate(startDate) : "Select date"}
                   </Text>
                 </Pressable>
               </View>
               <View style={styles.dateField}>
-                <Text style={styles.fieldLabel}>Leave</Text>
-                <Pressable onPress={() => setActiveField("leave")} style={styles.dateInputRow}>
+                <Text style={styles.fieldLabel}>End date</Text>
+                <Pressable onPress={() => setActiveField("endDate")} style={styles.dateInputRow}>
                   <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                  <Text style={leaveDate ? styles.dateValueText : styles.datePlaceholderText}>
-                    {leaveDate ? formatDate(leaveDate) : "Select date"}
+                  <Text style={endDate ? styles.dateValueText : styles.datePlaceholderText}>
+                    {endDate ? formatDate(endDate) : "Select date"}
                   </Text>
                 </Pressable>
               </View>
@@ -217,7 +217,7 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
                   <Text style={styles.stopBadgeText}>{index + 1}</Text>
                 </View>
                 <Text style={styles.stopLabel}>Stop {index + 1}</Text>
-                <Text style={styles.nightsText}>{formatNights(stop.arrive, stop.leave)}</Text>
+                <Text style={styles.nightsText}>{formatNights(stop.startDate, stop.endDate)}</Text>
                 <Pressable
                   accessibilityLabel={`Delete ${stop.city}`}
                   hitSlop={8}
@@ -247,17 +247,17 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
 
               <View style={styles.dateRow}>
                 <View style={styles.dateReadout}>
-                  <Text style={styles.fieldLabel}>Arrive</Text>
+                  <Text style={styles.fieldLabel}>Start date</Text>
                   <View style={styles.dateInputRow}>
                     <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                    <Text style={styles.dateValueText}>{formatDate(stop.arrive)}</Text>
+                    <Text style={styles.dateValueText}>{formatDate(stop.startDate)}</Text>
                   </View>
                 </View>
                 <View style={styles.dateReadout}>
-                  <Text style={styles.fieldLabel}>Leave</Text>
+                  <Text style={styles.fieldLabel}>End date</Text>
                   <View style={styles.dateInputRow}>
                     <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                    <Text style={styles.dateValueText}>{formatDate(stop.leave)}</Text>
+                    <Text style={styles.dateValueText}>{formatDate(stop.endDate)}</Text>
                   </View>
                 </View>
               </View>

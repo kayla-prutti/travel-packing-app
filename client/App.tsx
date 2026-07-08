@@ -89,10 +89,10 @@ export default function App() {
     if (selectedStops.length === 0) {
       return "Dates pending";
     }
-    const sortedArrivals = [...selectedStops].sort((a, b) => a.arrive.getTime() - b.arrive.getTime());
-    const sortedLeaves = [...selectedStops].sort((a, b) => b.leave.getTime() - a.leave.getTime());
-    const start = sortedArrivals[0].arrive;
-    const end = sortedLeaves[0].leave;
+    const sortedStarts = [...selectedStops].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+    const sortedEnds = [...selectedStops].sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
+    const start = sortedStarts[0].startDate;
+    const end = sortedEnds[0].endDate;
     const startText = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     const endText = end.toLocaleDateString("en-US", { day: "numeric" });
     return `${startText} – ${endText}`;
