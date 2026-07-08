@@ -12,6 +12,7 @@ import {
 } from "@expo-google-fonts/spectral";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { WebAppFrame } from "./src/components/web-app-frame";
 import { HomePage } from "./component/home-page/home-page";
 import type { Trip } from "./component/home-page/home-page";
 import { LoginPage } from "./component/login-page/login-page";
@@ -233,92 +234,96 @@ export default function App() {
   configureTypographyDefaults();
 
   return (
-    <SafeAreaProvider>
-      {screen === "login" && <LoginPage onSignIn={() => setScreen("home")} />}
-      {screen === "home" && (
-        <HomePage
-          accountEmail={accountEmail}
-          displayName={displayName}
-          onCreateTrip={() => {
-            setSelectedTripId(null);
-            setTripType(null);
-            setStops([]);
-            setWeatherAvailable(false);
-            setWeatherPackingItems([]);
-            setCustomItems([]);
-            setPackedItems({});
-            setScreen("trip-type");
-          }}
-          onDeleteTrip={(id) => {
-            if (!currentUserId) {
-              return;
-            }
-            setTripsByUser((current) => ({
-              ...current,
-              [currentUserId]: (current[currentUserId] ?? []).filter(
-                (trip) => trip.id !== id
-              ),
-            }));
-          }}
-          onLogout={handleLogout}
-          onOpenTrip={(trip) => {
-            setSelectedTripId(trip.id);
-            setTripType(trip.tripType);
-            setStops(trip.stops);
-            setWeatherAvailable(trip.weatherAvailable);
-            setWeatherPackingItems(trip.weatherPackingItems);
-            setCustomItems(trip.customItems);
-            setPackedItems(trip.packedItems);
-            setScreen("build-list");
-          }}
-          trips={currentTrips}
-        />
-      )}
-      {screen === "trip-type" && (
-        <TripTypePage
-          initialTripType={tripType}
-          onBack={() => setScreen("home")}
-          onContinue={(selectedTripType) => {
-            setTripType(selectedTripType);
-            setScreen("place-and-date");
-          }}
-        />
-      )}
-      {screen === "place-and-date" && (
-        <PlaceAndDatePage
-          existingTrips={currentTrips}
-          initialStops={stops}
-          onBack={() => setScreen("trip-type")}
-          onContinue={(selectedStops) => {
-            setStops(selectedStops);
-            setWeatherAvailable(false);
-            setWeatherPackingItems([]);
-            setCustomItems([]);
-            setPackedItems({});
-            setScreen("weather-check");
-          }}
-        />
-      )}
-      {screen === "weather-check" && (
-        <WeatherCheckPage
-          onBack={() => setScreen("place-and-date")}
-          onBuildPackingList={() => setScreen("build-list")}
-          onWeatherAvailabilityChange={handleWeatherAvailabilityChange}
-          stops={stops}
-        />
-      )}
-      {screen === "build-list" && (
-        <BuildListPage
-          onBack={() => setScreen(selectedTripId ? "home" : "weather-check")}
-          onFinish={saveTrip}
-          initialCustomItems={customItems}
-          initialPackedItems={packedItems}
-          stops={stops}
-          tripType={tripType}
-          weatherAvailable={weatherAvailable}
-          weatherPackingItems={weatherPackingItems}
-        />
-      )}
-    </SafeAreaProvider>
+    <WebAppFrame>
+      <SafeAreaProvider>
+        {screen === "login" && (
+          <LoginPage onSignIn={() => setScreen("home")} />
+        )}
+        {screen === "home" && (
+          <HomePage
+            accountEmail={accountEmail}
+            displayName={displayName}
+            onCreateTrip={() => {
+              setSelectedTripId(null);
+              setTripType(null);
+              setStops([]);
+              setWeatherAvailable(false);
+              setWeatherPackingItems([]);
+              setCustomItems([]);
+              setPackedItems({});
+              setScreen("trip-type");
+            }}
+            onDeleteTrip={(id) => {
+              if (!currentUserId) {
+                return;
+              }
+              setTripsByUser((current) => ({
+                ...current,
+                [currentUserId]: (current[currentUserId] ?? []).filter(
+                  (trip) => trip.id !== id
+                ),
+              }));
+            }}
+            onLogout={handleLogout}
+            onOpenTrip={(trip) => {
+              setSelectedTripId(trip.id);
+              setTripType(trip.tripType);
+              setStops(trip.stops);
+              setWeatherAvailable(trip.weatherAvailable);
+              setWeatherPackingItems(trip.weatherPackingItems);
+              setCustomItems(trip.customItems);
+              setPackedItems(trip.packedItems);
+              setScreen("build-list");
+            }}
+            trips={currentTrips}
+          />
+        )}
+        {screen === "trip-type" && (
+          <TripTypePage
+            initialTripType={tripType}
+            onBack={() => setScreen("home")}
+            onContinue={(selectedTripType) => {
+              setTripType(selectedTripType);
+              setScreen("place-and-date");
+            }}
+          />
+        )}
+        {screen === "place-and-date" && (
+          <PlaceAndDatePage
+            existingTrips={currentTrips}
+            initialStops={stops}
+            onBack={() => setScreen("trip-type")}
+            onContinue={(selectedStops) => {
+              setStops(selectedStops);
+              setWeatherAvailable(false);
+              setWeatherPackingItems([]);
+              setCustomItems([]);
+              setPackedItems({});
+              setScreen("weather-check");
+            }}
+          />
+        )}
+        {screen === "weather-check" && (
+          <WeatherCheckPage
+            onBack={() => setScreen("place-and-date")}
+            onBuildPackingList={() => setScreen("build-list")}
+            onWeatherAvailabilityChange={handleWeatherAvailabilityChange}
+            stops={stops}
+          />
+        )}
+        {screen === "build-list" && (
+          <BuildListPage
+            onBack={() => setScreen(selectedTripId ? "home" : "weather-check")}
+            onFinish={saveTrip}
+            initialCustomItems={customItems}
+            initialPackedItems={packedItems}
+            stops={stops}
+            tripType={tripType}
+            weatherAvailable={weatherAvailable}
+            weatherPackingItems={weatherPackingItems}
+          />
+        )}
+      </SafeAreaProvider>
+    </WebAppFrame>
   );
 }
