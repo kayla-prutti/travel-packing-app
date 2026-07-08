@@ -37,6 +37,7 @@ export default function App() {
   });
   const [screen, setScreen] = useState<Screen>("login");
   const [stops, setStops] = useState<Stop[]>([]);
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [tripsByUser, setTripsByUser] = useState<Record<string, Trip[]>>({});
 
@@ -79,31 +80,59 @@ export default function App() {
     if (!firstStop) {
       return "Destination pending";
     }
-    const stopCount = selectedStops.length === 1 ? "1 stop" : `${selectedStops.length} stops`;
-    return firstStop.weatherLocationQuery
-      ? `${firstStop.weatherLocationQuery} · ${stopCount}`
-      : stopCount;
+    return firstStop.weatherLocationQuery || firstStop.city;
   }
 
-  function formatDateRange(selectedStops: Stop[]): string {
+  function getTripDateBounds(selectedStops: Stop[]): { start: Date; end: Date } | null {
     if (selectedStops.length === 0) {
-      return "Dates pending";
+      return null;
     }
     const sortedStarts = [...selectedStops].sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
     const sortedEnds = [...selectedStops].sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
-    const start = sortedStarts[0].startDate;
-    const end = sortedEnds[0].endDate;
+    return {
+      start: sortedStarts[0].startDate,
+      end: sortedEnds[0].endDate,
+    };
+  }
+
+  function formatDateRange(selectedStops: Stop[]): string {
+    const bounds = getTripDateBounds(selectedStops);
+    if (!bounds) {
+      return "Dates pending";
+    }
+    const { start, end } = bounds;
     const startText = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     const endText = end.toLocaleDateString("en-US", { day: "numeric" });
     return `${startText} – ${endText}`;
   }
 
   function saveTrip(packedStatus: { packed: number; total: number }) {
+    if (selectedTripId && currentUserId) {
+      setTripsByUser((current) => ({
+        ...current,
+        [currentUserId]: (current[currentUserId] ?? []).map((trip) =>
+          trip.id === selectedTripId ? { ...trip, packedStatus } : trip,
+        ),
+      }));
+      setSelectedTripId(null);
+      setStops([]);
+      setScreen("home");
+      return;
+    }
+
+    const dateBounds = getTripDateBounds(stops);
+    if (!dateBounds) {
+      setScreen("home");
+      return;
+    }
     const trip: Trip = {
       id: `${Date.now()}`,
       name: formatTripName(stops),
       location: formatTripLocation(stops),
       dateRange: formatDateRange(stops),
+      startDate: dateBounds.start,
+      endDate: dateBounds.end,
+      stops,
       weatherIcon: "rainy",
       weatherRange: "1–8°",
       packedStatus,
@@ -136,7 +165,11 @@ export default function App() {
         <HomePage
           accountEmail={accountEmail}
           displayName={displayName}
-          onCreateTrip={() => setScreen("trip-type")}
+          onCreateTrip={() => {
+            setSelectedTripId(null);
+            setStops([]);
+            setScreen("trip-type");
+          }}
           onDeleteTrip={(id) => {
             if (!currentUserId) {
               return;
@@ -147,6 +180,11 @@ export default function App() {
             }));
           }}
           onLogout={handleLogout}
+          onOpenTrip={(trip) => {
+            setSelectedTripId(trip.id);
+            setStops(trip.stops);
+            setScreen("build-list");
+          }}
           trips={currentTrips}
         />
       )}
@@ -158,6 +196,7 @@ export default function App() {
       )}
       {screen === "place-and-date" && (
         <PlaceAndDatePage
+          existingTrips={currentTrips}
           onBack={() => setScreen("trip-type")}
           onContinue={(selectedStops) => {
             setStops(selectedStops);
@@ -174,7 +213,7 @@ export default function App() {
       )}
       {screen === "build-list" && (
         <BuildListPage
-          onBack={() => setScreen("weather-check")}
+          onBack={() => setScreen(selectedTripId ? "home" : "weather-check")}
           onFinish={saveTrip}
           stops={stops}
         />

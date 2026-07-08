@@ -31,6 +31,11 @@ export type Stop = {
 };
 
 type PlaceAndDatePageProps = {
+  existingTrips: {
+    name: string;
+    startDate: Date;
+    endDate: Date;
+  }[];
   onBack: () => void;
   onContinue: (stops: Stop[]) => void;
 };
@@ -89,6 +94,7 @@ function datesOverlap(
 }
 
 export function PlaceAndDatePage({
+  existingTrips,
   onBack,
   onContinue,
 }: PlaceAndDatePageProps) {
@@ -142,39 +148,46 @@ export function PlaceAndDatePage({
   }
 
   function addStop(stop: Stop) {
-    setStops((current) => [...current, stop]);
+    setStops([stop]);
     setCityInput("");
     setStartDate(null);
     setEndDate(null);
   }
 
-  function findOverlappingStops(newStartDate: Date, newEndDate: Date): Stop[] {
-    return stops.filter((stop) =>
-      datesOverlap(newStartDate, newEndDate, stop.startDate, stop.endDate)
+  function findOverlappingTrips(newStartDate: Date, newEndDate: Date) {
+    return existingTrips.filter((trip) =>
+      datesOverlap(newStartDate, newEndDate, trip.startDate, trip.endDate)
     );
   }
 
-  function confirmOverlappingStop(stop: Stop, overlappingStops: Stop[]) {
-    const overlapText = overlappingStops
+  function confirmOverlappingStop(
+    stop: Stop,
+    overlappingTrips: PlaceAndDatePageProps["existingTrips"]
+  ) {
+    const overlapText = overlappingTrips
       .map(
-        (overlappingStop) =>
-          `${overlappingStop.city} trip on ${formatDateRange(
-            overlappingStop.startDate,
-            overlappingStop.endDate
+        (overlappingTrip) =>
+          `${overlappingTrip.name} on ${formatDateRange(
+            overlappingTrip.startDate,
+            overlappingTrip.endDate
           )}`
       )
       .join("\n");
 
-    Alert.alert("Trip dates overlap", `${overlapText}`, [
-      {
-        text: "Pick new date",
-        style: "cancel",
-      },
-      {
-        text: "Add it anyway",
-        onPress: () => addStop(stop),
-      },
-    ]);
+    Alert.alert(
+      "Trip dates overlap",
+      `This trip will overlap with:\n${overlapText}`,
+      [
+        {
+          text: "Pick new date",
+          style: "cancel",
+        },
+        {
+          text: "Add it anyway",
+          onPress: () => addStop(stop),
+        },
+      ]
+    );
   }
 
   async function handleAddStop() {
@@ -204,9 +217,9 @@ export function PlaceAndDatePage({
         startDate,
         endDate,
       };
-      const overlappingStops = findOverlappingStops(startDate, endDate);
-      if (overlappingStops.length > 0) {
-        confirmOverlappingStop(stop, overlappingStops);
+      const overlappingTrips = findOverlappingTrips(startDate, endDate);
+      if (overlappingTrips.length > 0) {
+        confirmOverlappingStop(stop, overlappingTrips);
         return;
       }
       addStop(stop);
@@ -277,7 +290,7 @@ export function PlaceAndDatePage({
           <Text style={styles.title}>When & where?</Text>
 
           <View style={styles.newStopCard}>
-            <Text style={styles.newStopLabel}>New stop</Text>
+            <Text style={styles.newStopLabel}>Trip details</Text>
 
             <Text style={styles.fieldLabel}>City or place</Text>
             <TextInput
@@ -363,13 +376,10 @@ export function PlaceAndDatePage({
             </Pressable>
           </View>
 
-          {stops.map((stop, index) => (
+          {stops.map((stop) => (
             <View key={stop.id} style={styles.stopCard}>
               <View style={styles.stopTopRow}>
-                <View style={styles.stopBadge}>
-                  <Text style={styles.stopBadgeText}>{index + 1}</Text>
-                </View>
-                <Text style={styles.stopLabel}>Stop {index + 1}</Text>
+                <Text style={styles.stopLabel}>Trip</Text>
                 <Text style={styles.nightsText}>
                   {formatTripLength(stop.startDate, stop.endDate)}
                 </Text>

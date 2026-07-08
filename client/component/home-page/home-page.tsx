@@ -3,6 +3,7 @@ import { FlatList, Modal, Pressable, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
+import type { Stop } from "../place-and-date-page/place-and-date-page";
 import { styles } from "./home-page.styles";
 
 type PackedStatus = { packed: number; total: number } | "not-started";
@@ -12,6 +13,9 @@ export type Trip = {
   name: string;
   location: string;
   dateRange: string;
+  startDate: Date;
+  endDate: Date;
+  stops: Stop[];
   weatherIcon: "rainy" | "snow";
   weatherRange: string;
   packedStatus: PackedStatus;
@@ -23,6 +27,7 @@ type HomePageProps = {
   onLogout: () => void;
   onCreateTrip: () => void;
   onDeleteTrip: (id: string) => void;
+  onOpenTrip: (trip: Trip) => void;
   trips: Trip[];
 };
 
@@ -46,6 +51,7 @@ export function HomePage({
   onLogout,
   onCreateTrip,
   onDeleteTrip,
+  onOpenTrip,
   trips,
 }: HomePageProps) {
   const insets = useSafeAreaInsets();
@@ -155,7 +161,7 @@ export function HomePage({
           </View>
         }
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <Pressable onPress={() => onOpenTrip(item)} style={styles.card}>
             <View style={styles.cardTopRow}>
               <Text style={styles.tripName}>{item.name}</Text>
               <View style={styles.cardTopActions}>
@@ -170,7 +176,10 @@ export function HomePage({
                 <Pressable
                   accessibilityLabel={`Delete ${item.name}`}
                   hitSlop={8}
-                  onPress={() => requestDeleteTrip(item)}
+                  onPress={(event) => {
+                    event.stopPropagation();
+                    requestDeleteTrip(item);
+                  }}
                   style={styles.deleteButton}
                 >
                   <Ionicons name="trash-outline" size={18} color="#8a4a2e" />
@@ -200,7 +209,7 @@ export function HomePage({
                 </View>
               )}
             </View>
-          </View>
+          </Pressable>
         )}
         showsVerticalScrollIndicator={false}
         style={styles.list}
