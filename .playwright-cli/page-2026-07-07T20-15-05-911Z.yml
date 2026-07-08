@@ -1,0 +1,22 @@
+- generic [ref=f1e2]:
+  - generic [ref=f1e8]:
+    - generic [ref=f1e11]: PackSmart
+    - generic [ref=f1e12]: Pack smart for every kind of trip.
+    - generic [ref=f1e13]: Tailored lists for hiking, city, beach and beyond with a quick weather check so nothing's forgotten.
+    - generic [ref=f1e14]:
+      - generic [ref=f1e15]:
+        - generic [ref=f1e16]: Email
+        - textbox "alex@trailmail.co" [ref=f1e17]
+      - generic [ref=f1e18]:
+        - generic [ref=f1e19]:
+          - generic [ref=f1e20]: Password
+          - textbox "••••••••" [ref=f1e21]
+        - generic "Show password" [ref=f1e22] [cursor=pointer]
+      - generic [ref=f1e24] [cursor=pointer]: Sign in
+    - generic [ref=f1e27]: or continue with
+    - generic [ref=f1e29]:
+      - generic [ref=f1e31] [cursor=pointer]: Apple
+      - generic [ref=f1e33] [cursor=pointer]: Google
+    - generic [ref=f1e34]: New here? Create account
+  - generic:
+    - img

@@ -1,6 +1,6 @@
-# Packwise
+# PackSmart
 
-Expo + React Native mobile app for Packwise.
+Expo + React Native mobile app for PackSmart.
 
 ## Run
 
