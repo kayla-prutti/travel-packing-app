@@ -44,15 +44,6 @@ type PlaceAndDatePageProps = {
 
 type ActiveField = "startDate" | "endDate" | null;
 
-const webDateInputStyle = {
-  border: "1px solid #e3c9a0",
-  borderRadius: 16,
-  color: "#2d1b12",
-  fontSize: 18,
-  padding: 12,
-  width: "100%",
-};
-
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", {
     weekday: "short",
@@ -65,18 +56,6 @@ function startOfDay(date: Date): Date {
   const day = new Date(date);
   day.setHours(0, 0, 0, 0);
   return day;
-}
-
-function toInputDateString(date: Date): string {
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function fromInputDateString(value: string): Date {
-  const [year, month, day] = value.split("-").map(Number);
-  return new Date(year, month - 1, day);
 }
 
 function formatTripLength(startDate: Date, endDate: Date): string {
@@ -138,17 +117,6 @@ export function PlaceAndDatePage({
     endDate !== null &&
     startOfDay(endDate) >= startOfDay(startDate);
 
-  function applySelectedDate(field: ActiveField, selectedDate: Date) {
-    if (field === "startDate") {
-      setStartDate(selectedDate);
-      if (endDate && endDate < selectedDate) {
-        setEndDate(null);
-      }
-    } else if (field === "endDate") {
-      setEndDate(selectedDate);
-    }
-  }
-
   function handleDateChange(
     event: DateTimePickerEvent,
     selectedDate: Date | undefined
@@ -160,14 +128,14 @@ export function PlaceAndDatePage({
     if (event.type === "dismissed" || !selectedDate || !field) {
       return;
     }
-    applySelectedDate(field, selectedDate);
-  }
-
-  function handleWebDateChange(value: string) {
-    if (!value) {
-      return;
+    if (field === "startDate") {
+      setStartDate(selectedDate);
+      if (endDate && endDate < selectedDate) {
+        setEndDate(null);
+      }
+    } else {
+      setEndDate(selectedDate);
     }
-    applySelectedDate(activeField, fromInputDateString(value));
   }
 
   function handleConfirmDateSelection() {
@@ -539,36 +507,6 @@ export function PlaceAndDatePage({
               />
               <Pressable
                 onPress={handleConfirmDateSelection}
-                style={styles.pickerDoneButton}
-              >
-                <Text style={styles.pickerDoneText}>Done</Text>
-              </Pressable>
-            </View>
-          </Pressable>
-        </Modal>
-      ) : null}
-
-      {activeField && Platform.OS === "web" ? (
-        <Modal
-          animationType="fade"
-          onRequestClose={() => setActiveField(null)}
-          transparent
-        >
-          <Pressable
-            onPress={() => setActiveField(null)}
-            style={styles.pickerBackdrop}
-          >
-            <View style={styles.pickerSheet}>
-              <input
-                autoFocus
-                min={toInputDateString(pickerMinimumDate)}
-                onChange={(event) => handleWebDateChange(event.target.value)}
-                style={webDateInputStyle}
-                type="date"
-                value={toInputDateString(pickerValue)}
-              />
-              <Pressable
-                onPress={() => setActiveField(null)}
                 style={styles.pickerDoneButton}
               >
                 <Text style={styles.pickerDoneText}>Done</Text>
