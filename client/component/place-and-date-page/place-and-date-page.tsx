@@ -10,7 +10,9 @@ import {
   TextInput,
   View,
 } from "react-native";
-import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -36,7 +38,11 @@ type PlaceAndDatePageProps = {
 type ActiveField = "startDate" | "endDate" | null;
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function startOfDay(date: Date): Date {
@@ -48,13 +54,44 @@ function startOfDay(date: Date): Date {
 function formatTripLength(startDate: Date, endDate: Date): string {
   const days = Math.max(
     1,
-    Math.round((startOfDay(endDate).getTime() - startOfDay(startDate).getTime()) / (1000 * 60 * 60 * 24)) +
-      1,
+    Math.round(
+      (startOfDay(endDate).getTime() - startOfDay(startDate).getTime()) /
+        (1000 * 60 * 60 * 24)
+    ) + 1
   );
   return `${days} day${days === 1 ? "" : "s"} trip`;
 }
 
-export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) {
+function formatDateRange(startDate: Date, endDate: Date): string {
+  const startText = startDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  const endText = endDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  return `${startText} - ${endText}`;
+}
+
+// check if two date ranges overlap, inclusive of start and end dates
+function datesOverlap(
+  firstStart: Date,
+  firstEnd: Date,
+  secondStart: Date,
+  secondEnd: Date
+): boolean {
+  const firstStartDay = startOfDay(firstStart).getTime();
+  const firstEndDay = startOfDay(firstEnd).getTime();
+  const secondStartDay = startOfDay(secondStart).getTime();
+  const secondEndDay = startOfDay(secondEnd).getTime();
+  return firstStartDay <= secondEndDay && secondStartDay <= firstEndDay;
+}
+
+export function PlaceAndDatePage({
+  onBack,
+  onContinue,
+}: PlaceAndDatePageProps) {
   const [stops, setStops] = useState<Stop[]>([]);
   const [cityInput, setCityInput] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -70,7 +107,10 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
     endDate !== null &&
     startOfDay(endDate) >= startOfDay(startDate);
 
-  function handleDateChange(event: DateTimePickerEvent, selectedDate: Date | undefined) {
+  function handleDateChange(
+    event: DateTimePickerEvent,
+    selectedDate: Date | undefined
+  ) {
     const field = activeField;
     if (Platform.OS === "android") {
       setActiveField(null);
@@ -91,11 +131,50 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
   function handleConfirmDateSelection() {
     if (activeField === "startDate") {
       setStartDate(pickerValue);
+      if (endDate && startOfDay(endDate) < startOfDay(pickerValue)) {
+        setEndDate(null);
+      }
     }
     if (activeField === "endDate") {
       setEndDate(pickerValue);
     }
     setActiveField(null);
+  }
+
+  function addStop(stop: Stop) {
+    setStops((current) => [...current, stop]);
+    setCityInput("");
+    setStartDate(null);
+    setEndDate(null);
+  }
+
+  function findOverlappingStops(newStartDate: Date, newEndDate: Date): Stop[] {
+    return stops.filter((stop) =>
+      datesOverlap(newStartDate, newEndDate, stop.startDate, stop.endDate)
+    );
+  }
+
+  function confirmOverlappingStop(stop: Stop, overlappingStops: Stop[]) {
+    const overlapText = overlappingStops
+      .map(
+        (overlappingStop) =>
+          `${overlappingStop.city} trip on ${formatDateRange(
+            overlappingStop.startDate,
+            overlappingStop.endDate
+          )}`
+      )
+      .join("\n");
+
+    Alert.alert("Trip dates overlap", `${overlapText}`, [
+      {
+        text: "Pick new date",
+        style: "cancel",
+      },
+      {
+        text: "Add it anyway",
+        onPress: () => addStop(stop),
+      },
+    ]);
   }
 
   async function handleAddStop() {
@@ -108,29 +187,35 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
     try {
       const location = await geocodeLocation(weatherLocationQuery);
       if (!location) {
-        setLocationError("Choose a real city or place so we can get the forecast.");
+        setLocationError(
+          "Choose a real city or place so we can get the forecast."
+        );
         return;
       }
-      setStops((current) => [
-        ...current,
-        {
-          id: `${Date.now()}`,
-          city: location.name,
-          country: location.admin1
-            ? `${location.admin1}, ${location.country}`
-            : location.country,
-          latitude: location.latitude,
-          longitude: location.longitude,
-          weatherLocationQuery,
-          startDate,
-          endDate,
-        },
-      ]);
-      setCityInput("");
-      setStartDate(null);
-      setEndDate(null);
+      const stop: Stop = {
+        id: `${Date.now()}`,
+        city: location.name,
+        country: location.admin1
+          ? `${location.admin1}, ${location.country}`
+          : location.country,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        weatherLocationQuery,
+        startDate,
+        endDate,
+      };
+      const overlappingStops = findOverlappingStops(startDate, endDate);
+      if (overlappingStops.length > 0) {
+        confirmOverlappingStop(stop, overlappingStops);
+        return;
+      }
+      addStop(stop);
     } catch (error) {
-      setLocationError(error instanceof Error ? error.message : "Unable to check that location right now.");
+      setLocationError(
+        error instanceof Error
+          ? error.message
+          : "Unable to check that location right now."
+      );
     } finally {
       setIsCheckingLocation(false);
     }
@@ -141,7 +226,10 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
   }
 
   function handleEditStop(stop: Stop) {
-    Alert.alert("Edit stop", `Editing ${stop.city} can be added after this screen.`);
+    Alert.alert(
+      "Edit stop",
+      `Editing ${stop.city} can be added after this screen.`
+    );
   }
 
   function handleContinue() {
@@ -151,8 +239,11 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
   }
 
   const pickerValue =
-    activeField === "endDate" ? endDate ?? startDate ?? today : startDate ?? today;
-  const pickerMinimumDate = activeField === "endDate" && startDate ? startDate : today;
+    activeField === "endDate"
+      ? endDate ?? startDate ?? today
+      : startDate ?? today;
+  const pickerMinimumDate =
+    activeField === "endDate" && startDate ? startDate : today;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -161,8 +252,12 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
           <Ionicons name="arrow-back" size={20} color="#3a2317" />
         </Pressable>
         <View style={styles.progressRow}>
-          <View style={[styles.progressSegment, styles.progressSegmentActive]} />
-          <View style={[styles.progressSegment, styles.progressSegmentActive]} />
+          <View
+            style={[styles.progressSegment, styles.progressSegmentActive]}
+          />
+          <View
+            style={[styles.progressSegment, styles.progressSegmentActive]}
+          />
           <View style={styles.progressSegment} />
           <View style={styles.progressSegment} />
         </View>
@@ -196,15 +291,26 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
               value={cityInput}
             />
             <View style={styles.locationMessageSlot}>
-              {locationError ? <Text style={styles.locationError}>{locationError}</Text> : null}
+              {locationError ? (
+                <Text style={styles.locationError}>{locationError}</Text>
+              ) : null}
             </View>
 
             <View style={styles.dateRow}>
               <View style={styles.dateField}>
                 <Text style={styles.fieldLabel}>Start date</Text>
-                <Pressable onPress={() => setActiveField("startDate")} style={styles.dateInputRow}>
+                <Pressable
+                  onPress={() => setActiveField("startDate")}
+                  style={styles.dateInputRow}
+                >
                   <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                  <Text style={startDate ? styles.dateValueText : styles.datePlaceholderText}>
+                  <Text
+                    style={
+                      startDate
+                        ? styles.dateValueText
+                        : styles.datePlaceholderText
+                    }
+                  >
                     {startDate ? formatDate(startDate) : "Select date"}
                   </Text>
                 </Pressable>
@@ -214,11 +320,24 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
                 <Pressable
                   disabled={!startDate}
                   onPress={() => setActiveField("endDate")}
-                  style={[styles.dateInputRow, !startDate && styles.dateInputRowDisabled]}
+                  style={[
+                    styles.dateInputRow,
+                    !startDate && styles.dateInputRowDisabled,
+                  ]}
                 >
                   <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                  <Text style={endDate ? styles.dateValueText : styles.datePlaceholderText}>
-                    {endDate ? formatDate(endDate) : startDate ? "Select date" : "Choose start first"}
+                  <Text
+                    style={
+                      endDate
+                        ? styles.dateValueText
+                        : styles.datePlaceholderText
+                    }
+                  >
+                    {endDate
+                      ? formatDate(endDate)
+                      : startDate
+                      ? "Select date"
+                      : "Choose start first"}
                   </Text>
                 </Pressable>
               </View>
@@ -229,13 +348,17 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
               onPress={handleAddStop}
               style={({ pressed }) => [
                 styles.addStopButton,
-                (!canAddStop || isCheckingLocation) && styles.addStopButtonDisabled,
-                pressed && canAddStop && !isCheckingLocation && styles.addStopButtonPressed,
+                (!canAddStop || isCheckingLocation) &&
+                  styles.addStopButtonDisabled,
+                pressed &&
+                  canAddStop &&
+                  !isCheckingLocation &&
+                  styles.addStopButtonPressed,
               ]}
             >
               <Ionicons name="add-circle-outline" size={18} color="#fff8ea" />
               <Text style={styles.addStopButtonText}>
-                {isCheckingLocation ? "Checking place..." : "Add this stop"}
+                {isCheckingLocation ? "Checking place..." : "Add this trip"}
               </Text>
             </Pressable>
           </View>
@@ -247,7 +370,9 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
                   <Text style={styles.stopBadgeText}>{index + 1}</Text>
                 </View>
                 <Text style={styles.stopLabel}>Stop {index + 1}</Text>
-                <Text style={styles.nightsText}>{formatTripLength(stop.startDate, stop.endDate)}</Text>
+                <Text style={styles.nightsText}>
+                  {formatTripLength(stop.startDate, stop.endDate)}
+                </Text>
                 <Pressable
                   accessibilityLabel={`Delete ${stop.city}`}
                   hitSlop={8}
@@ -262,7 +387,9 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
                 <Ionicons name="location" size={20} color="#d98a3d" />
                 <View style={styles.stopCityTextWrap}>
                   <Text style={styles.stopCity}>{stop.city}</Text>
-                  {stop.country ? <Text style={styles.stopCountry}>{stop.country}</Text> : null}
+                  {stop.country ? (
+                    <Text style={styles.stopCountry}>{stop.country}</Text>
+                  ) : null}
                 </View>
                 <Pressable
                   accessibilityLabel={`Edit ${stop.city}`}
@@ -279,15 +406,27 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
                 <View style={styles.dateReadout}>
                   <Text style={styles.fieldLabel}>Start date</Text>
                   <View style={styles.dateInputRow}>
-                    <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                    <Text style={styles.dateValueText}>{formatDate(stop.startDate)}</Text>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={16}
+                      color="#d98a3d"
+                    />
+                    <Text style={styles.dateValueText}>
+                      {formatDate(stop.startDate)}
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.dateReadout}>
                   <Text style={styles.fieldLabel}>End date</Text>
                   <View style={styles.dateInputRow}>
-                    <Ionicons name="calendar-outline" size={16} color="#d98a3d" />
-                    <Text style={styles.dateValueText}>{formatDate(stop.endDate)}</Text>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={16}
+                      color="#d98a3d"
+                    />
+                    <Text style={styles.dateValueText}>
+                      {formatDate(stop.endDate)}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -295,9 +434,14 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
           ))}
 
           <View style={styles.tipCard}>
-            <MaterialCommunityIcons name="bag-suitcase-outline" size={18} color="#c9502e" />
+            <MaterialCommunityIcons
+              name="bag-suitcase-outline"
+              size={18}
+              color="#c9502e"
+            />
             <Text style={styles.tipText}>
-              We&apos;ll tailor your list to each stop — and peek at the forecast for the extras.
+              We&apos;ll tailor your list to each stop — and peek at the
+              forecast for the extras.
             </Text>
           </View>
         </ScrollView>
@@ -328,8 +472,15 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
       ) : null}
 
       {activeField && Platform.OS === "ios" ? (
-        <Modal animationType="slide" onRequestClose={() => setActiveField(null)} transparent>
-          <Pressable onPress={() => setActiveField(null)} style={styles.pickerBackdrop}>
+        <Modal
+          animationType="slide"
+          onRequestClose={() => setActiveField(null)}
+          transparent
+        >
+          <Pressable
+            onPress={() => setActiveField(null)}
+            style={styles.pickerBackdrop}
+          >
             <View style={styles.pickerSheet}>
               <DateTimePicker
                 display="spinner"
@@ -338,7 +489,10 @@ export function PlaceAndDatePage({ onBack, onContinue }: PlaceAndDatePageProps) 
                 onChange={handleDateChange}
                 value={pickerValue}
               />
-              <Pressable onPress={handleConfirmDateSelection} style={styles.pickerDoneButton}>
+              <Pressable
+                onPress={handleConfirmDateSelection}
+                style={styles.pickerDoneButton}
+              >
                 <Text style={styles.pickerDoneText}>Done</Text>
               </Pressable>
             </View>
