@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   InstrumentSans_400Regular,
   InstrumentSans_500Medium,
@@ -39,6 +39,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
   const [tripType, setTripType] = useState<TripType | null>(null);
   const [stops, setStops] = useState<Stop[]>([]);
+  const [weatherAvailable, setWeatherAvailable] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [tripsByUser, setTripsByUser] = useState<Record<string, Trip[]>>({});
@@ -135,6 +136,8 @@ export default function App() {
       startDate: dateBounds.start,
       endDate: dateBounds.end,
       stops,
+      tripType,
+      weatherAvailable,
       weatherIcon: "rainy",
       weatherRange: "1–8°",
       packedStatus,
@@ -154,6 +157,10 @@ export default function App() {
     setScreen("login");
   }
 
+  const handleWeatherAvailabilityChange = useCallback((available: boolean) => {
+    setWeatherAvailable(available);
+  }, []);
+
   if (!instrumentSansLoaded || !spectralLoaded) {
     return null;
   }
@@ -171,6 +178,7 @@ export default function App() {
             setSelectedTripId(null);
             setTripType(null);
             setStops([]);
+            setWeatherAvailable(false);
             setScreen("trip-type");
           }}
           onDeleteTrip={(id) => {
@@ -185,7 +193,9 @@ export default function App() {
           onLogout={handleLogout}
           onOpenTrip={(trip) => {
             setSelectedTripId(trip.id);
+            setTripType(trip.tripType);
             setStops(trip.stops);
+            setWeatherAvailable(trip.weatherAvailable);
             setScreen("build-list");
           }}
           trips={currentTrips}
@@ -208,6 +218,7 @@ export default function App() {
           onBack={() => setScreen("trip-type")}
           onContinue={(selectedStops) => {
             setStops(selectedStops);
+            setWeatherAvailable(false);
             setScreen("weather-check");
           }}
         />
@@ -216,6 +227,7 @@ export default function App() {
         <WeatherCheckPage
           onBack={() => setScreen("place-and-date")}
           onBuildPackingList={() => setScreen("build-list")}
+          onWeatherAvailabilityChange={handleWeatherAvailabilityChange}
           stops={stops}
         />
       )}
@@ -224,6 +236,8 @@ export default function App() {
           onBack={() => setScreen(selectedTripId ? "home" : "weather-check")}
           onFinish={saveTrip}
           stops={stops}
+          tripType={tripType}
+          weatherAvailable={weatherAvailable}
         />
       )}
     </SafeAreaProvider>

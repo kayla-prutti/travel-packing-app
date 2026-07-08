@@ -4,12 +4,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import type { Stop } from "../place-and-date-page/place-and-date-page";
+import type { TripType } from "../trip-type-page/trip-type-page";
 import { styles } from "./build-list-page.styles";
 
 type BuildListPageProps = {
   onBack: () => void;
   onFinish: (packedStatus: { packed: number; total: number }) => void;
   stops: Stop[];
+  tripType: TripType | null;
+  weatherAvailable: boolean;
 };
 
 type PackingItem = {
@@ -56,21 +59,13 @@ const weatherItems: PackingItem[] = [
   },
 ];
 
-const baseSections: PackingSection[] = [
+const sharedSections: PackingSection[] = [
   {
     title: "Documents",
     items: [
       { id: "passport", label: "Passport", packed: false },
       { id: "boarding-passes", label: "Boarding passes", packed: false },
       { id: "insurance-card", label: "Travel insurance card", packed: false },
-    ],
-  },
-  {
-    title: "Clothing",
-    items: [
-      { id: "tops", label: "Tops for each day", packed: false },
-      { id: "trousers", label: "Trousers or jeans", packed: false },
-      { id: "sleepwear", label: "Sleepwear", packed: false },
     ],
   },
   {
@@ -81,15 +76,160 @@ const baseSections: PackingSection[] = [
       { id: "travel-adapter", label: "Travel adapter", packed: false },
     ],
   },
+];
+
+const tripTypeSections: Record<TripType, PackingSection[]> = {
+  hiking: [
+    {
+      title: "Trail gear",
+      items: [
+        { id: "hiking-daypack", label: "Daypack", packed: false },
+        { id: "hiking-water-bottle", label: "Water bottle or hydration bladder", packed: false },
+        { id: "hiking-navigation", label: "Map or offline trail app", packed: false },
+        { id: "hiking-first-aid", label: "Small first-aid kit", packed: false },
+      ],
+    },
+    {
+      title: "Trail clothing",
+      items: [
+        { id: "hiking-trail-shoes", label: "Hiking shoes", packed: false },
+        { id: "hiking-socks", label: "Wool or hiking socks", packed: false },
+        { id: "hiking-layers", label: "Breathable layers", packed: false },
+      ],
+    },
+  ],
+  city: [
+    {
+      title: "City days",
+      items: [
+        { id: "city-walking-shoes", label: "Comfortable walking shoes", packed: false },
+        { id: "city-day-bag", label: "Small day bag", packed: false },
+        { id: "city-outfit", label: "Dinner outfit", packed: false },
+        { id: "city-sunglasses", label: "Sunglasses", packed: false },
+      ],
+    },
+    {
+      title: "Clothing",
+      items: [
+        { id: "city-tops", label: "Tops for each day", packed: false },
+        { id: "city-bottoms", label: "Trousers, jeans, or skirt", packed: false },
+        { id: "city-sleepwear", label: "Sleepwear", packed: false },
+      ],
+    },
+  ],
+  "beach-town": [
+    {
+      title: "Beach gear",
+      items: [
+        { id: "beach-swimwear", label: "Swimwear", packed: false },
+        { id: "beach-coverup", label: "Cover-up or light shirt", packed: false },
+        { id: "beach-sandals", label: "Sandals", packed: false },
+        { id: "beach-dry-bag", label: "Wet/dry bag", packed: false },
+      ],
+    },
+    {
+      title: "Sun care",
+      items: [
+        { id: "beach-sunscreen", label: "Sunscreen", packed: false },
+        { id: "beach-hat", label: "Sun hat", packed: false },
+        { id: "beach-after-sun", label: "After-sun lotion", packed: false },
+      ],
+    },
+  ],
+  business: [
+    {
+      title: "Work essentials",
+      items: [
+        { id: "business-laptop", label: "Laptop", packed: false },
+        { id: "business-laptop-charger", label: "Laptop charger", packed: false },
+        { id: "business-notebook", label: "Notebook or meeting notes", packed: false },
+        { id: "business-cards", label: "Business cards", packed: false },
+      ],
+    },
+    {
+      title: "Business clothing",
+      items: [
+        { id: "business-outfit", label: "Meeting outfit", packed: false },
+        { id: "business-shoes", label: "Dress shoes", packed: false },
+        { id: "business-belt", label: "Belt or accessories", packed: false },
+      ],
+    },
+  ],
+  ski: [
+    {
+      title: "Ski gear",
+      items: [
+        { id: "ski-goggles", label: "Goggles", packed: false },
+        { id: "ski-gloves", label: "Ski gloves", packed: false },
+        { id: "ski-neck-warmer", label: "Neck warmer", packed: false },
+        { id: "ski-pass", label: "Lift pass or booking info", packed: false },
+      ],
+    },
+    {
+      title: "Cold layers",
+      items: [
+        { id: "ski-base-layers", label: "Thermal base layers", packed: false },
+        { id: "ski-socks", label: "Ski socks", packed: false },
+        { id: "ski-mid-layer", label: "Fleece or mid-layer", packed: false },
+      ],
+    },
+  ],
+  backpacking: [
+    {
+      title: "Backpacking gear",
+      items: [
+        { id: "backpacking-pack", label: "Backpack", packed: false },
+        { id: "backpacking-packing-cubes", label: "Packing cubes or stuff sacks", packed: false },
+        { id: "backpacking-lock", label: "Travel lock", packed: false },
+        { id: "backpacking-laundry", label: "Laundry bag", packed: false },
+      ],
+    },
+    {
+      title: "Flexible clothing",
+      items: [
+        { id: "backpacking-quick-dry", label: "Quick-dry shirts", packed: false },
+        { id: "backpacking-versatile-bottoms", label: "Versatile bottoms", packed: false },
+        { id: "backpacking-light-jacket", label: "Light jacket", packed: false },
+      ],
+    },
+  ],
+};
+
+const fallbackSections: PackingSection[] = [
   {
-    title: "Toiletries",
+    title: "Clothing",
     items: [
-      { id: "toothbrush", label: "Toothbrush & paste", packed: false },
-      { id: "moisturiser", label: "Moisturiser", packed: false },
-      { id: "lip-balm", label: "Lip balm", packed: false },
+      { id: "general-tops", label: "Tops for each day", packed: false },
+      { id: "general-bottoms", label: "Trousers or jeans", packed: false },
+      { id: "general-sleepwear", label: "Sleepwear", packed: false },
     ],
   },
 ];
+
+const toiletrySection: PackingSection = {
+  title: "Toiletries",
+  items: [
+    { id: "toothbrush", label: "Toothbrush & paste", packed: false },
+    { id: "deodorant", label: "Deodorant", packed: false },
+    { id: "moisturiser", label: "Moisturiser", packed: false },
+    { id: "lip-balm", label: "Lip balm", packed: false },
+  ],
+};
+
+function getBaseSections(tripType: TripType | null): PackingSection[] {
+  return [
+    ...sharedSections,
+    ...(tripType ? tripTypeSections[tripType] : fallbackSections),
+    toiletrySection,
+  ];
+}
+
+function getAllStaticItems(sections: PackingSection[], includeWeatherItems: boolean) {
+  return [
+    ...(includeWeatherItems ? weatherItems : []),
+    ...sections.flatMap((section) => section.items),
+  ];
+}
 
 function formatTripTitle(stops: Stop[]): string {
   const firstStop = stops[0];
@@ -99,13 +239,10 @@ function formatTripTitle(stops: Stop[]): string {
   return `${firstStop.city} city break`;
 }
 
-function createInitialItems(): Record<string, boolean> {
-  const allItems = [
-    ...weatherItems,
-    ...baseSections.flatMap((section) => section.items),
-  ];
+function createInitialItems(sections: PackingSection[], includeWeatherItems: boolean): Record<string, boolean> {
+  const allItems = getAllStaticItems(sections, includeWeatherItems);
   return allItems.reduce<Record<string, boolean>>((current, item) => {
-    current[item.id] = item.packed;
+    current[item.id] = false;
     return current;
   }, {});
 }
@@ -113,26 +250,30 @@ function createInitialItems(): Record<string, boolean> {
 function CheckCircle({ checked }: { checked: boolean }) {
   return (
     <View style={[styles.checkCircle, checked && styles.checkCircleChecked]}>
-      {checked ? <Ionicons name="checkmark" size={22} color="#fff8ea" /> : null}
+      {checked ? <Ionicons name="checkmark" size={17} color="#fff8ea" /> : null}
     </View>
   );
 }
 
-export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
-  const [packedItems, setPackedItems] = useState(createInitialItems);
+export function BuildListPage({
+  onBack,
+  onFinish,
+  stops,
+  tripType,
+  weatherAvailable,
+}: BuildListPageProps) {
+  const baseSections = useMemo(() => getBaseSections(tripType), [tripType]);
+  const [packedItems, setPackedItems] = useState(() => createInitialItems(baseSections, weatherAvailable));
   const [customItems, setCustomItems] = useState<PackingItem[]>([]);
   const [customInput, setCustomInput] = useState("");
   const tripTitle = formatTripTitle(stops);
 
   const totals = useMemo(() => {
-    const staticItems = [
-      ...weatherItems,
-      ...baseSections.flatMap((section) => section.items),
-    ];
+    const staticItems = getAllStaticItems(baseSections, weatherAvailable);
     const allItems = [...staticItems, ...customItems];
     const packedCount = allItems.filter((item) => packedItems[item.id]).length;
     return { packedCount, totalCount: allItems.length };
-  }, [customItems, packedItems]);
+  }, [baseSections, customItems, packedItems, weatherAvailable]);
 
   const progress =
     totals.totalCount === 0 ? 0 : totals.packedCount / totals.totalCount;
@@ -175,8 +316,8 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
 
       <View style={styles.headerCopy}>
         <Text style={styles.stepLabel}>Step 4 · Build list</Text>
-        <Text style={styles.tripLabel}>{tripTitle}</Text>
         <Text style={styles.title}>Packing list</Text>
+        <Text style={styles.tripLabel}>{tripTitle}</Text>
       </View>
 
       <View style={styles.progressRow}>
@@ -198,47 +339,49 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
         showsVerticalScrollIndicator={false}
         style={styles.scrollView}
       >
-        <View style={styles.weatherSection}>
-          <View style={styles.weatherHeadingRow}>
-            <Text style={styles.weatherBang}>!</Text>
-            <Text style={styles.weatherTitle}>Because of the weather</Text>
+        {weatherAvailable ? (
+          <View style={styles.weatherSection}>
+            <View style={styles.weatherHeadingRow}>
+              <Text style={styles.weatherBang}>!</Text>
+              <Text style={styles.weatherTitle}>Because of the weather</Text>
+            </View>
+            <Text style={styles.weatherIntro}>
+              Extra items worth having. Skip any you&apos;d rather borrow or buy
+              at your destination.
+            </Text>
+            <View style={styles.weatherList}>
+              {weatherItems.map((item) => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => toggleItem(item.id)}
+                  style={styles.weatherItem}
+                >
+                  <View style={styles.weatherIconWrap}>
+                    <MaterialCommunityIcons
+                      name={item.icon ?? "bag-personal-outline"}
+                      size={24}
+                      color="#c27a18"
+                    />
+                  </View>
+                  <View style={styles.itemTextWrap}>
+                    <Text style={styles.itemLabel}>{item.label}</Text>
+                    {item.detail ? (
+                      <View style={styles.itemDetailRow}>
+                        <Ionicons
+                          name="information-circle-outline"
+                          size={16}
+                          color="#c27a18"
+                        />
+                        <Text style={styles.itemDetail}>{item.detail}</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                  <CheckCircle checked={!!packedItems[item.id]} />
+                </Pressable>
+              ))}
+            </View>
           </View>
-          <Text style={styles.weatherIntro}>
-            Extra items worth having. Skip any you&apos;d rather borrow or buy
-            at your destination.
-          </Text>
-          <View style={styles.weatherList}>
-            {weatherItems.map((item) => (
-              <Pressable
-                key={item.id}
-                onPress={() => toggleItem(item.id)}
-                style={styles.weatherItem}
-              >
-                <View style={styles.weatherIconWrap}>
-                  <MaterialCommunityIcons
-                    name={item.icon ?? "bag-personal-outline"}
-                    size={24}
-                    color="#c27a18"
-                  />
-                </View>
-                <View style={styles.itemTextWrap}>
-                  <Text style={styles.itemLabel}>{item.label}</Text>
-                  {item.detail ? (
-                    <View style={styles.itemDetailRow}>
-                      <Ionicons
-                        name="information-circle-outline"
-                        size={16}
-                        color="#c27a18"
-                      />
-                      <Text style={styles.itemDetail}>{item.detail}</Text>
-                    </View>
-                  ) : null}
-                </View>
-                <CheckCircle checked={!!packedItems[item.id]} />
-              </Pressable>
-            ))}
-          </View>
-        </View>
+        ) : null}
 
         {baseSections.map((section) => (
           <View key={section.title} style={styles.sectionWrap}>
@@ -275,7 +418,7 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
             </View>
           ) : null}
           <View style={styles.addItemRow}>
-            <Ionicons name="add" size={28} color="#8b7a65" />
+            <Ionicons name="add" size={22} color="#8b7a65" />
             <TextInput
               onChangeText={setCustomInput}
               onSubmitEditing={addCustomItem}
@@ -286,7 +429,7 @@ export function BuildListPage({ onBack, onFinish, stops }: BuildListPageProps) {
               value={customInput}
             />
             <Pressable onPress={addCustomItem} style={styles.addItemButton}>
-              <Ionicons name="arrow-up" size={30} color="#fff8ea" />
+              <Ionicons name="arrow-up" size={22} color="#fff8ea" />
             </Pressable>
           </View>
           <Text style={styles.helperText}>

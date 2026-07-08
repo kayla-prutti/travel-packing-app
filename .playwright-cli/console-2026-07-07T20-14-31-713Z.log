@@ -50,3 +50,13 @@ Performance optimizations: OFF. @ http://localhost:8082/index.ts.bundle?platform
   187 |       </ScrollView>
   188 |
   189 |       <View style={styles.footer}>
+[21739350ms] SyntaxError: /Users/craiglink/travel-packing-app/client/component/build-list-page/build-list-page.tsx: Missing semicolon. (279:9)
+
+  277 |   {
+  278 |     title: "Toiletries",
+> 279 |     items: [
+      |          ^
+  280 |       { id: "toothbrush", label: "Toothbrush & paste", packed: false },
+  281 |       { id: "moisturiser", label: "Moisturiser", packed: false },
+  282 |       { id: "lip-balm", label: "Lip balm", packed: false },
+[21828357ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://localhost:8082/:0

@@ -4,6 +4,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import type { Stop } from "../place-and-date-page/place-and-date-page";
+import type { TripType } from "../trip-type-page/trip-type-page";
 import { styles } from "./home-page.styles";
 
 type PackedStatus = { packed: number; total: number } | "not-started";
@@ -16,6 +17,8 @@ export type Trip = {
   startDate: Date;
   endDate: Date;
   stops: Stop[];
+  tripType: TripType | null;
+  weatherAvailable: boolean;
   weatherIcon: "rainy" | "snow";
   weatherRange: string;
   packedStatus: PackedStatus;

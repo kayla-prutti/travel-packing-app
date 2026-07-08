@@ -19,6 +19,7 @@ import { styles } from "./weather-check-page.styles";
 type WeatherCheckPageProps = {
   onBuildPackingList: () => void;
   onBack: () => void;
+  onWeatherAvailabilityChange: (available: boolean) => void;
   stops: Stop[];
 };
 
@@ -46,6 +47,7 @@ function formatAvailableFrom(date: Date): string {
 export function WeatherCheckPage({
   onBack,
   onBuildPackingList,
+  onWeatherAvailabilityChange,
   stops,
 }: WeatherCheckPageProps) {
   const location = formatLocation(stops);
@@ -67,12 +69,13 @@ export function WeatherCheckPage({
     fetchTripForecast(stops).then((result) => {
       if (isMounted) {
         setForecastState({ key: forecastRequestKey, result });
+        onWeatherAvailabilityChange(result.status === "available");
       }
     });
     return () => {
       isMounted = false;
     };
-  }, [forecastRequestKey, stops]);
+  }, [forecastRequestKey, onWeatherAvailabilityChange, stops]);
 
   const forecastResult =
     forecastState?.key === forecastRequestKey ? forecastState.result : null;
